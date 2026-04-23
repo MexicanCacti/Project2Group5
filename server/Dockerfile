@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-ENV PORT 3000
+ENV PORT 8080
 WORKDIR /app
 COPY package*.json ./
 RUN npm i
