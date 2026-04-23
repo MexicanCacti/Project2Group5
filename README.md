@@ -3,6 +3,9 @@
 ## Build and Run
 
 ### Local Deployment
+
+*Note: Make sure Docker Engine is running on your machine!
+
 From the project root directory:
 
 ```bash
