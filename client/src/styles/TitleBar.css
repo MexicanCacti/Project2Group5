@@ -1,0 +1,12 @@
+#TitleBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: right ;
+    align-items: center;
+    gap: 2%;
+    width: 100%;
+}
+
+.TitleButton{
+    color: crimson;
+}
