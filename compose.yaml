@@ -5,10 +5,13 @@ services:
       dockerfile: Dockerfile
     container_name: tell-tales-client
     ports:
-      - "5173:5173"
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
     volumes:
       - ./client:/app
       - /app/node_modules
+    env_file:
+      - .env
+      - ./client/.env
     depends_on:
       - server
 
@@ -18,7 +21,10 @@ services:
       dockerfile: Dockerfile
     container_name: tell-tales-server
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
       - ./server:/app
       - /app/node_modules
+    env_file:
+      - .env
+      - ./server/.env
