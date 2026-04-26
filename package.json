@@ -7,11 +7,12 @@
     "start": "node server/src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "docker compose up --build",
-    "down": "docker compose down",
+    "down": "docker compose down -v",
     "rebuild": "docker compose up --build --force-recreate",
     "gcp-build": "cd client && npm install && npm run build"
   },
-    "dependencies": {
+  "dependencies": {
+    "@google/genai": "^1.50.1",
     "cors": "^2.8.6",
     "express": "^5.2.1"
   },
