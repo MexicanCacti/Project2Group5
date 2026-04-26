@@ -1,1 +1,6 @@
 runtime: nodejs24
+
+env_variables:
+  SERVER_PORT: 8080
+  CLIENT_PORT: 5173
+  GEMINI_API_KEY:
