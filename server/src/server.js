@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 8080;
+const PORT = process.env.PORT || process.env.SERVER_PORT || 8080;
 
 const { GoogleGenAI } = require("@google/genai");
 
@@ -28,10 +28,6 @@ app.use(express.static(clientPath));
 
 const clientDistPath = path.join(__dirname, "../../client/dist");
 app.use(express.static(clientDistPath));
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(clientDistPath, "index.html"));
-});
 
 // Note for any backend requests, I am choosing to use the /api/ prefix. See vite.config.js, this prefix should mirror the proxy
 app.post("/api/transcribe", async (req, res) => {
@@ -66,6 +62,10 @@ app.post("/api/transcribe", async (req, res) => {
       error: err.message || "Transcription failed",
     });
   }
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
 app.listen(PORT, () => {

@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite --host 0.0.0.0 --port ${CLIENT_PORT}",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "vite preview --port ${CLIENT_PORT}",
     "docker-build:dev": "docker build -t tell-tales-client:0.0.1 -f Dockerfile .",
-    "docker-run:dev": "docker run -it -p 5173:5173 --name tell-tales-client-container -v ./:/app -v /app/node_modules tell-tales-client:0.0.1",
+    "docker-run:dev": "docker run -it -p ${CLIENT_PORT}:${CLIENT_PORT} --name tell-tales-client-container -v ./:/app -v /app/node_modules tell-tales-client:0.0.1",
     "docker-start:dev": "docker start tell-tales-client-container",
     "docker-stop:dev": "docker stop tell-tales-client-container",
     "npm-docker": "docker exec tell-tales-client-container sh -c \"npm i\""
