@@ -44,3 +44,10 @@ gcloud app create
 ```bash
 gcloud app deploy ./app.yaml
 ```
+### ENV notes /app.yaml
+<b> Fill these before deploying! </b>
+- SERVER_PORT: Port to expose for Express.js
+- CLIENT_PORT: Port to expose for React
+- GEMINI_API_KEY: Key for sending requests to the Gemini API
+
+Basically, instead of local deployment having separate .env files for client/server, GAE deployment centralizes them into one under app.yaml
