@@ -1,0 +1,55 @@
+#stories {
+    background-color: aliceblue;
+    min-height: 100vh;
+    display: flex;
+}
+
+
+#StoriesContent {
+    padding: 60px 8%;
+    text-align: center;
+}
+
+
+#StoriesIntro {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#StoriesIntro h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #070817;
+}
+
+#StoriesIntro p {
+    font-size: 20px;
+    color: #5f6675;
+    margin-bottom: 28px;
+}
+
+#StoriesCreateNav {
+    background-color: #070817;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 22px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#StoriesCreateNav:hover {
+    background-color: #1f2937;
+}
+
+#StoriesBox {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    min-height: 320px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
