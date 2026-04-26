@@ -3,7 +3,8 @@ import {useState, useEffect, useRef} from 'react'
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
-
+import {GenerateImage} from '../services/Photos.js';
+import defaultImage from '../assets/hero.png';
 /*
 * Code adapted from:
 * Title: simple-react-recorder
@@ -150,12 +151,28 @@ function AudioBox({ value, onChange }) {
     );
 }
 
+function ImageBox({ value, onChange }) {
+    return (
+        <img
+            alt="Generated Image"
+            src={value}
+            onChange={(e) => onChange(e.target.value)}
+        />
+    )
+}
+
 function Page() {
-    const [audioDescription, setAudioDescription] = useState('');
+    const [audioDescription, setAudioDescription] = useState('A man smiling while holding a puppy');
+    const [generatedImage, setGeneratedImage] = useState(defaultImage);
 
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
         setAudioDescription(result);
+    }
+
+    async function UploadText(AudioText) {
+        const result = await GenerateImage(AudioText);
+        setGeneratedImage(result);
     }
 
     return (
@@ -163,7 +180,10 @@ function Page() {
             <TitleBar />
 
             <div id="PageImage">
-                Image goes here
+                <ImageBox
+                    value={generatedImage}
+                    onChange={setGeneratedImage}
+                />
             </div>
 
             <div id="AudioPortion">
@@ -176,6 +196,7 @@ function Page() {
                 <SimpleRecordButton
                     HandleRecording={ UploadAudio }
                 />
+                <button onClick={() => UploadText(audioDescription)}>Generate Image</button>
             </div>
 
             <div id="CharacterPortion">

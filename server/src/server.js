@@ -64,6 +64,48 @@ app.post("/api/transcribe", async (req, res) => {
   }
 });
 
+app.post("/api/generate", async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (typeof text !== "string") {
+      return res.status(400).json({ error: "Invalid text input" });
+    }
+
+    // Basically give the prompt, then provide the data for the prompt to work with.
+    const TextPrompt = `Create a cartoon-style illustration with clean outlines, vibrant colors, and a playful look: ${text}
+    Do not give request further options or elaboration, just generate a single image and return that.`
+    ;
+
+    console.log(TextPrompt);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-image",
+      contents: TextPrompt
+    });
+
+
+
+    for (const part of response.parts || []) {
+      if (part.inlineData) {
+        return res.json({
+          imageBuffer: part.inlineData.data,
+          mimeType: part.inlineData.mimeType,
+        });
+      }
+    }
+
+    return res.status(500).json({
+      error: "Generation failed",
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: err.message || "Generation failed",
+    });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
 });
