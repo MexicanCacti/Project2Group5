@@ -1,0 +1,38 @@
+#Characters {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+#CharactersContent {
+    padding: 60px 8%;
+    text-align: center;
+}
+
+#CharactersIntro h1 {
+    font-size: 48px;
+    font-weight: 800;
+}
+
+#CharactersIntro p {
+    font-size: 20px;
+    color: #5f6675;
+}
+
+#CharactersIntro button {
+    background-color: #070817;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 22px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#CharactersBox {
+    width: 84%;
+    min-height: 260px;
+    margin: 40px auto;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+}
