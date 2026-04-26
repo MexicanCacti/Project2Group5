@@ -1,7 +1,8 @@
 import {useState, useEffect, useRef} from 'react'
 
 import TitleBar from "../components/TitleBar.jsx";
-import '../styles/Page.css'
+import '../styles/Page.css';
+import {TranscribeAudio} from '../services/Audio.js';
 
 /*
 * Code adapted from:
@@ -11,6 +12,7 @@ import '../styles/Page.css'
 * Availability: https://gist.github.com/cassidoo/dd1190c248d60c723de14fe9ee32f450
 *
 * Creates a component to obtain microphone permissions, record audio, allow replay, and submission
+* HandleRecording: Function to call to handle the raw recorded audio input, should have an argument for receiving this input
  */
 function SimpleRecordButton( {HandleRecording} ) {
     const [isRecording, setIsRecording] = useState(false);
@@ -148,13 +150,12 @@ function AudioBox({ value, onChange }) {
     );
 }
 
-
-
 function Page() {
     const [audioDescription, setAudioDescription] = useState('');
 
     async function UploadAudio(AudioBlob){
-        // Do Transcription, upload state with results
+        const result = await TranscribeAudio(AudioBlob);
+        setAudioDescription(result);
     }
 
     return (
