@@ -13,7 +13,7 @@ export default defineConfig({
       interval: 30
     },
     proxy: {
-      "/api": {
+      "/gemini": {
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
       },

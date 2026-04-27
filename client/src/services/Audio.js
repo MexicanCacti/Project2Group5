@@ -21,7 +21,7 @@ export async function BlobToBase64(AudioBlob){
 export async function DoTranscription(AudioBlob) {
     const base64Audio = await BlobToBase64(AudioBlob);
 
-    const res = await fetch("/api/transcribe", {
+    const res = await fetch("/gemini/transcribe", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

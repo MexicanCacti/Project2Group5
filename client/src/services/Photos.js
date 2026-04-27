@@ -1,5 +1,5 @@
 export async function GenerateImage(TextSource){
-    const res = await fetch("/api/generate", {
+    const res = await fetch("/gemini/generate", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
