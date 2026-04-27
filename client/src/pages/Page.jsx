@@ -4,7 +4,18 @@ import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
 import {GenerateImage} from '../services/Photos.js';
+
 import defaultImage from '../assets/hero.png';
+
+/*
+import {useState, useEffect, useRef} from 'react'
+
+import TitleBar from "../components/TitleBar.jsx";
+import '../styles/Page.css';
+import {TranscribeAudio} from '../services/Audio.js';
+import {GenerateImage} from '../services/Photos.js';
+import defaultImage from '../assets/hero.png';
+
 /*
 * Code adapted from:
 * Title: simple-react-recorder
@@ -136,7 +147,6 @@ function SimpleRecordButton( {HandleRecording} ) {
     );
 }
 
-
 /*
 * Set up a text box so that when the audio is transcribed, the user can check and make any corrections
 * before sending for image processing.
@@ -204,6 +214,7 @@ function Page() {
                     <h3>CharacterList goes here</h3>
                 </div>
                 <button>Upload Character</button>
+                <button>Upload from Google Photos</button>
             </div>
         </div>
     );
