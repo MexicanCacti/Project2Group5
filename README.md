@@ -32,6 +32,11 @@ npm run rebuild
 #### Server /server/.env
 - GEMINI_API_KEY: Key for sending requests to the Gemini API
 - DATABASE_ID: The name of the database
+- CLIENT_ID: OAuth client ID to send with OAuth requests
+- CLIENT_SECRET: OAuth client secret to send with OAuth requests
+- SESSION_SECRET: Secret for state to send with OAuth requests
+- REDIRECT_URL: URL to process the OAUTH call back
+- FRONTEND_OAUTH_COMPLETE_URL: Where to redirect the client once OAuth completes
 
 #### Client /client/.env
 - No env required yet
@@ -59,5 +64,10 @@ gcloud app deploy ./app.yaml
 - CLIENT_PORT: Port to expose for React
 - GEMINI_API_KEY: Key for sending requests to the Gemini API
 - DATABASE_ID: The name of the database
+- CLIENT_ID: OAuth client ID to send with OAuth requests
+- CLIENT_SECRET: OAuth client secret to send with OAuth requests
+- SESSION_SECRET: Secret for state to send with OAuth requests
+- REDIRECT_URL: URL to process the OAUTH call back
+- FRONTEND_OAUTH_COMPLETE_URL: Where to redirect the client once OAuth completes
 
 Basically, instead of local deployment having separate .env files for client/server, GAE deployment centralizes them into one under app.yaml
