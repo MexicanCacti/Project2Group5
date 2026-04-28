@@ -1,0 +1,168 @@
+
+/* Page Container */
+#Page {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #070817;
+    display: grid;
+    grid-template-columns: minmax(360px, 1.35fr) minmax(320px, 0.85fr);
+    grid-template-areas:
+        "title title"
+        "image audio"
+        "image images";
+    gap: 28px;
+    align-items: start;
+    padding-bottom: 64px;
+}
+
+/* Page Title Bar */
+#Page > #TitleBar {
+    grid-area: title;
+}
+
+/* Page Image */
+#PageImage {
+
+    grid-area: image; 
+    width: min(92%, 760px);
+    justify-self: end;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+#PageImage img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #eef2f7;
+}
+
+#AudioPortion,
+#ImagePortion {
+    width: min(92%, 520px);
+    justify-self: start;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+#AudioPortion {
+    grid-area: audio;
+}
+
+#ImagePortion {
+    grid-area: images;
+}
+
+#AudioPortion h3,
+#ImageList h3 {
+    margin: 0 0 16px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+#AudioTranscriptBox {
+    margin-bottom: 18px;
+}
+
+#AudioTranscriptBox input {
+    width: 100%;
+    min-height: 52px;
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #111827;
+    font-size: 1rem;
+    background-color: #f9fafb;
+}
+
+#AudioTranscriptBox input:focus {
+    outline: 3px solid rgba(37, 99, 235, 0.18);
+    border-color: #2563eb;
+    background-color: #ffffff;
+}
+
+#AudioPortion > div:not(#AudioTranscriptBox) {
+    margin-bottom: 18px;
+}
+
+#AudioPortion button,
+#ImagePortion button {
+    min-height: 46px;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 18px;
+    background-color: #070817;
+    color: #ffffff;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+#AudioPortion button:hover,
+#ImagePortion button:hover {
+    background-color: #1f2937;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+}
+
+#AudioPortion > button {
+    width: 100%;
+}
+
+#AudioPortion audio {
+    width: 100%;
+    margin: 10px 0 14px;
+}
+
+#AudioPortion p {
+    margin: 8px 0;
+    color: #5f6675;
+    font-weight: 600;
+}
+
+#ImageList {
+    min-height: 180px;
+    margin-bottom: 18px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 18px;
+    background-color: #f8fafc;
+}
+
+#ImageList h3 {
+    color: #5f6675;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#ImagePortion {
+    display: grid;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    #Page {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "title"
+            "image"
+            "audio"
+            "images";
+    }
+
+    #PageImage,
+    #AudioPortion,
+    #ImagePortion {
+        width: min(92%, 720px);
+        justify-self: center;
+    }
+}
