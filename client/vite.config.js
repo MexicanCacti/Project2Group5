@@ -20,6 +20,10 @@ export default defineConfig({
       "/user": {
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
+      },
+      "/googlephotos": {
+        target: "http://server:" + SERVER_PORT,
+        changeOrigin: true,
       }
     },
   },

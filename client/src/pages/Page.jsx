@@ -203,9 +203,9 @@ function Page() {
                 <button onClick={() => UploadText(audioDescription)}>Generate Image</button>
             </div>
 
-            <div id="CharacterPortion">
-                <div id="CharacterList">
-                    <h3>CharacterList goes here</h3>
+            <div id="ImagePortion">
+                <div id="ImageList">
+                    <h3>Image List goes here</h3>
                 </div>
                 <button>Upload Character</button>
                 <button onClick={() => UploadGooglePhotos(username)}>Upload from Google Photos</button>

@@ -1,45 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const saltRounds = 1;
-// DB already connected, see firestore.js, all db transactions use db
-const {db} = require('../services/firestore');
+
+const { CheckUserExists, CreateUser, DoPasswordHash, SaveOAuthToken } = require('../services/userfunctions');
 
 const {HandleOAuthCallback, InitOAuth} = require("../services/oauth");
 
-async function CheckUserExists(username) {
-    // Note: Username are the docIDs, guaranteed to be unique
-    const doc = await db.collection('users').doc(username).get();
-    return doc.exists ? doc : null;
-}
-
-async function CreateUser(username, password) {
-
-    //Goes to the collection "user", sets the DocID to be username, then sets the username & password fields
-    const docRef = db.collection("users").doc(username);
-
-    await docRef.set({
-        username: username,
-        password: password
-    });
-
-    return true;
-}
-
-async function DoPasswordHash(password){
-    return bcrypt.hash(password, saltRounds);
-}
-
-async function saveOAuthToken(username, refreshToken, expiryTime) {
-    const update = {
-        photosConnected: true,
-        connectedAt: Date.now(),
-        refreshToken: refreshToken,
-        refreshExpire: expiryTime
-    };
-
-    await db.collection('users').doc(username).set(update, { merge: true });
-}
+const {db} = require('../services/firestore');
 
 // A test route to ensure database connection works
 router.get("/firestore-test", async (req, res) => {
@@ -165,7 +132,7 @@ router.get('/oauth_callback', async (req, res) => {
         if(!tokens) return;
 
         if(tokens.refresh_token){
-            await saveOAuthToken(username, tokens.refresh_token, tokens.expiry_date);
+            await SaveOAuthToken(username, tokens.refresh_token, tokens.expiry_date);
         }
 
         req.session.authenticated = true;

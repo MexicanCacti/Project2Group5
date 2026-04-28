@@ -7,14 +7,14 @@ function AuthComplete() {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate('/storybook');
+            navigate('/stories');
         }, 2000);
 
         return () => clearTimeout(timer);
     }, [navigate]);
 
     const handleContinue = () => {
-        navigate('/storybook');
+        navigate('/stories');
     };
 
     return (

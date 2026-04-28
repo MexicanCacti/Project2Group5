@@ -8,14 +8,15 @@ const crypto = require('crypto');
 const scopes = [
     'https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata',
     'https://www.googleapis.com/auth/photoslibrary.readonly',
-    'https://www.googleapis.com/auth/photoslibrary.sharing'
+    'https://www.googleapis.com/auth/photoslibrary.sharing',
+    'https://www.googleapis.com/auth/photospicker.mediaitems.readonly'
 ]
 
 /*
     See: https://developers.google.com/identity/protocols/oauth2/web-server#node.js
     For how to generate auth credentials
  */
-function createOAuthClient(){
+function CreateOAuthClient(){
     return new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
@@ -24,7 +25,7 @@ function createOAuthClient(){
 }
 
 function InitOAuth(req, res) {
-    const OAuth2Client = createOAuthClient();
+    const OAuth2Client = CreateOAuthClient();
     const state = crypto.randomBytes(32).toString('hex');
 
     req.session.state = state;
@@ -41,7 +42,7 @@ function InitOAuth(req, res) {
 }
 
 async function HandleOAuthCallback(req, res) {
-    const OAuth2Client = createOAuthClient();
+    const OAuth2Client = CreateOAuthClient();
 
     const { code, state } = req.query;
 
@@ -66,4 +67,4 @@ async function HandleOAuthCallback(req, res) {
     return {tokens, username};
 }
 
-module.exports = {InitOAuth, HandleOAuthCallback};
+module.exports = {InitOAuth, HandleOAuthCallback, CreateOAuthClient};

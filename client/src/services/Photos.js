@@ -14,8 +14,6 @@ export async function GenerateImage(TextSource){
 }
 
 export async function UploadGooglePhotos(username) {
-    console.log(username);
-
     const statusRes = await fetch(`/user/o_status?username=${encodeURIComponent(username)}`, {
         method: "GET",
         credentials: 'include',
@@ -29,8 +27,35 @@ export async function UploadGooglePhotos(username) {
     }
 
     if(status.authNeeded) {
-        window.location.assign(status.authURL);
+        window.open(status.authURL, '_authenticate_');
         return;
     }
+
+    const pickersetup = await fetch(`/googlephotos/session`, {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: username,
+        })
+    })
+
+    const data = await pickersetup.json();
+
+    console.log("session response", data);
+
+    if (!pickersetup.ok) {
+        console.error("session setup failed", data);
+        return;
+    }
+
+    if (!data.pickerUri) {
+        console.error("No pickerUri returned", data);
+        return;
+    }
+
+    window.open(data.pickerUri, '_blank');
 
 }
