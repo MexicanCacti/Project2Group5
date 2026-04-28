@@ -7,8 +7,8 @@
     "start": "node server/src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "docker compose up --build",
-    "down": "docker compose down -v",
-    "rebuild": "docker compose up --build --force-recreate",
+    "down": "docker compose down -v --remove-orphans",
+    "rebuild": "docker compose down -v --remove-orphans && docker compose up --build --force-recreate",
     "gcp-build": "cd client && npm install && npm run build"
   },
   "dependencies": {

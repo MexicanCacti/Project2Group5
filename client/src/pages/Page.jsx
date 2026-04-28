@@ -4,17 +4,10 @@ import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
 import {GenerateImage} from '../services/Photos.js';
+import {UploadGooglePhotos} from "../services/Photos.js";
 
 import defaultImage from '../assets/hero.png';
-
-/*
-import {useState, useEffect, useRef} from 'react'
-
-import TitleBar from "../components/TitleBar.jsx";
-import '../styles/Page.css';
-import {TranscribeAudio} from '../services/Audio.js';
-import {GenerateImage} from '../services/Photos.js';
-import defaultImage from '../assets/hero.png';
+import {useUser} from "../components/UserContext.jsx";
 
 /*
 * Code adapted from:
@@ -172,6 +165,7 @@ function ImageBox({ value, onChange }) {
 }
 
 function Page() {
+    const { username, setUsername } = useUser();
     const [audioDescription, setAudioDescription] = useState('A man smiling while holding a puppy');
     const [generatedImage, setGeneratedImage] = useState(defaultImage);
 
@@ -214,7 +208,7 @@ function Page() {
                     <h3>CharacterList goes here</h3>
                 </div>
                 <button>Upload Character</button>
-                <button>Upload from Google Photos</button>
+                <button onClick={() => UploadGooglePhotos(username)}>Upload from Google Photos</button>
             </div>
         </div>
     );

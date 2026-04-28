@@ -22,7 +22,7 @@ npm run down
 npm run rebuild
 ```
 
-### ENV notes
+### Setup notes
 <b> Create these before deploying! </b>
 
 #### Project Root Directory .env
@@ -31,9 +31,18 @@ npm run rebuild
 
 #### Server /server/.env
 - GEMINI_API_KEY: Key for sending requests to the Gemini API
+- DATABASE_ID: The name of the database
 
 #### Client /client/.env
 - No env required yet
+
+### Server /server/services/serviceAccount.json
+- When you create your database, go to the firebase console:
+- -> Settings
+- -> General
+- -> Service accounts
+- -> Generate new private key
+- -> Copy and paste contents into serviceAccount
 
 ### Google Cloud Deployment
 
@@ -49,5 +58,6 @@ gcloud app deploy ./app.yaml
 - SERVER_PORT: Port to expose for Express.js
 - CLIENT_PORT: Port to expose for React
 - GEMINI_API_KEY: Key for sending requests to the Gemini API
+- DATABASE_ID: The name of the database
 
 Basically, instead of local deployment having separate .env files for client/server, GAE deployment centralizes them into one under app.yaml

@@ -1,19 +1,20 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || process.env.SERVER_PORT || 8080;
 
-const geminiRouter = require("../routes/gemini");
-
-// 10mb just to catch any audio transcribed to large errors
+// 10mb just to catch any audio transcribed too large errors
 app.use(express.json({ limit:"10mb"}));
-
-const cors = require("cors");
-
 app.use(cors({
   origin: "http://localhost:" + (process.env.CLIENT_PORT || 5173)
 }));
+
+const geminiRouter = require("../routes/gemini");
+const userRouter = require("../routes/user");
+const googlePhotosRouter = require("../routes/googlePhotos");
 
 const clientPath = path.join(__dirname, '../../client/src');
 app.use(express.static(clientPath));
@@ -21,7 +22,21 @@ app.use(express.static(clientPath));
 const clientDistPath = path.join(__dirname, "../../client/dist");
 app.use(express.static(clientDistPath));
 
+// Needed to send state for OAuth w/ Google
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+  },
+}));
+
 app.use("/gemini", geminiRouter);
+app.use("/user", userRouter);
+app.use("/googlePhotos", googlePhotosRouter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
