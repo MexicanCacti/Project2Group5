@@ -98,3 +98,7 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
 
     return data;
 }
+
+export async function setImages(setImageListState, imageList){
+    setImageListState((prev) => [...prev, ...(imageList.images || [])]);
+}
