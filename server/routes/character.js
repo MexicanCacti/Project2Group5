@@ -4,3 +4,5 @@ const router = express.Router();
 router.post("/character/upload", async (req, res) => {
 
 });
+
+module.exports=router;
