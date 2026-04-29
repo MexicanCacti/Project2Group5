@@ -25,37 +25,69 @@ async function SaveGoogleImageToStorage({
 
     const file = bucket.file(objectPath);
 
-    await file.save(imageBuffer, {
-        contentType: mimeType || 'image/jpeg',
-        metadata: {
-            username,
-            source: "google_photos",
-            sourceID
-        },
-        resumable: false,
-    });
+    let existingFile = await db
+        .collection('users')
+        .doc(username)
+        .collection('images')
+        .doc(sourceID)
+        .get();
 
     const [signedURL] = await GetSignedURL(file)
 
-    const docRef = await db
-        .collection("users")
-        .doc(username)
-        .collection("images")
-        .add({
-            source: "google_photos",
-            sourceID,
-            filename: name,
-            mimeType: mimeType || "image/jpeg",
-            storagePath: objectPath,
-            publicUrl: signedURL,
-            createdAt: Date.now(),
+    // New file, save to bucket & firestore
+    if(!existingFile.exists){
+        await file.save(imageBuffer, {
+            contentType: mimeType || 'image/jpeg',
+            metadata: {
+                username,
+                source: "google_photos",
+                sourceID
+            },
+            resumable: false,
         });
 
+
+        existingFile = await db
+            .collection("users")
+            .doc(username)
+            .collection("images")
+            .doc(sourceID)
+            .set({
+                source: "google_photos",
+                sourceID,
+                filename: name,
+                mimeType: mimeType || "image/jpeg",
+                storagePath: objectPath,
+                publicUrl: signedURL,
+                createdAt: Date.now(),
+            });
+    }
+
+    // Return the ID of the file, the signed url,
     return {
-        id: docRef.id,
-        url: signedURL,
-        storagePath: objectPath
+        id: existingFile.id,
+        url: signedURL
     };
 }
 
-module.exports = {SaveGoogleImageToStorage}
+async function GetAllUserCharacters(username) {
+    // Look in 'users' collection based on username, then the collection containing all the image storage info
+    const characterSnapshot = await db
+        .collection("users")
+        .doc(username)
+        .collection("images")
+        .orderBy("createdAt", "desc")
+        .get();
+
+    // Normalize the return output
+    return characterSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            url: data.publicUrl,
+        };
+    })
+        .filter((img) => img.url); // dont return any img with an undefined publicUrl
+}
+
+module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters}

@@ -3,12 +3,9 @@ import {useState, useEffect, useRef} from 'react'
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
-import {
-    GenerateImage,
-    PollForPickedGooglePhoto,
-    UploadGooglePhotos,
-    WaitForPickedGooglePhoto
-} from '../services/Photos.js';
+import { GenerateImage, setImages } from '../services/Photos.js';
+
+import {fetchAllCharacters} from '../services/Characters.js';
 
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
@@ -174,6 +171,17 @@ function Page() {
     const [generatedImage, setGeneratedImage] = useState(defaultImage);
     const [imageList, setImageList] = useState([]);
 
+    useEffect(() => {
+        async function loadCharacters() {
+            if(!username) return;
+
+            const characters = await fetchAllCharacters(username);
+
+            await setImages(setImageList, characters);
+        }
+        loadCharacters();
+    }, [username]);
+
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
         setAudioDescription(result);
@@ -211,7 +219,7 @@ function Page() {
                         <img
                             key={img.id}
                             src={img.url}
-                            alt={img.filename || "Picked image"}
+                            alt="Picked image"
                             style={{ width: "120px", height: "120px" }}
                             onClick={() => setGeneratedImage(img.url)}
                         />

@@ -143,7 +143,6 @@ router.get('/session/:sessionID/media', async (req, res) => {
 
             if (!baseUrl) continue;
 
-
             const photoRes = await fetch(`${baseUrl}=w1200-h1200`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
