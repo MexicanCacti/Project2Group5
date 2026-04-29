@@ -37,7 +37,7 @@ app.use(session({
 app.use("/gemini", geminiRouter);
 app.use("/user", userRouter);
 app.use("/googlephotos", googlePhotosRouter);
-app.use("/charater", characterRouter)
+app.use("/character", characterRouter)
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));

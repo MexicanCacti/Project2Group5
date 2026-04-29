@@ -138,4 +138,27 @@ router.get('/oauth_callback', async (req, res) => {
     }
 })
 
+// Route to get all the character images stored for the user
+router.get('/characters', async (req, res) => {
+    try{
+        const {username} = req.query;
+        if(!username) {
+            return res.status(400).json({ error: "No username supplied" });
+        }
+
+        const userRef = await CheckUserExists(username);
+        if(!userRef) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const characters = await GetAllUserCharacters(username);
+
+        return res.json({ images: characters});
+
+    } catch(err) {
+        console.log(err);
+        return res.status(500).json({error: "Failed to fetch characters.", details: err.message});
+    }
+});
+
 module.exports=router;

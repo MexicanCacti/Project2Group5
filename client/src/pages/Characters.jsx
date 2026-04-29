@@ -1,13 +1,33 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Characters.css';
-import {uploadCharacter} from "../services/Characters.js";
+import {fetchAllCharacters, uploadCharacter} from "../services/Characters.js";
+import GooglePhotosButton from '../components/GooglePhotosButton.jsx'
+import {useUser} from "../components/UserContext.jsx";
+import {setImages} from "../services/Photos.js";
+import DisplayImages from '../components/ImageDisplay.jsx';
+import {changeCharacterAlias} from '../services/Characters.js';
 
 function Characters() {
     const [charGenHidden, setCharGenHidden] = useState(false);
     const [charGenName, setCharGenName] = useState('');
     const [charGenRefFile, setCharGenRefFile] = useState('');
     const [charGenFileError, setCharGenFileError] = useState('');
+    const [imageList, setImageList] = useState([]);
+    const {username} = useUser();
+
+    // On page load, retrieves every character a user has uploaded
+    useEffect(() => {
+        async function loadCharacters() {
+            if(!username) return;
+
+            const characters = await fetchAllCharacters(username);
+            console.log(characters.images);
+
+            await setImages(setImageList, characters);
+        }
+        loadCharacters();
+    }, [username]);
 
     {/* Write a new character to the database*/}
     const handleSubmit = (e) => {
@@ -46,6 +66,8 @@ function Characters() {
                     
                     {/*Button should do a dialog pop-up box to let the user upload or provide a link to an image?*/}
                     <button onClick={() => {toggleForm();}}>Add Character</button>
+                    <GooglePhotosButton label="Add Character from Google Photos" username={username} setImageList={setImageList} />
+
 
                     {/* */}
                     {charGenHidden && (
@@ -83,8 +105,7 @@ function Characters() {
             {/*Also add button to allow user to add a character, similar to one in the above div*/}
             {/*When listing characters, maybe also include what stories the character is a part of?*/}
             <div id="CharactersBox">
-
-
+                <DisplayImages ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias} DisplayStories={true}/>
             </div>
 
         </div>

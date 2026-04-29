@@ -85,10 +85,8 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
     );
 
     const data = await res.json();
-    console.log("poll response", data);
 
     if (!res.ok) {
-        console.error("poll failed", data);
         return null;
     }
 
@@ -97,4 +95,14 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
     }
 
     return data;
+}
+
+// Append new images to the current image list
+export async function addImages(setImageListState, imageList) {
+    setImageListState((prev) => [...prev, ...(imageList.images || [])]);
+}
+
+// Complete replace the image list
+export async function setImages(setImageListState, imageList){
+    setImageListState((imageList.images || []));
 }

@@ -80,7 +80,8 @@ router.post('/session', async (req, res) => {
 router.get('/session/:sessionID/media', async (req, res) => {
     try{
         const {sessionID} = req.params;
-        const {username} = req.query;
+        let {username, storyID} = req.query;
+        if(!storyID) storyID = null;
 
         if(!sessionID){
             return res.status(400).json({error: "No session ID provided"});
@@ -143,7 +144,6 @@ router.get('/session/:sessionID/media', async (req, res) => {
 
             if (!baseUrl) continue;
 
-
             const photoRes = await fetch(`${baseUrl}=w1200-h1200`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -163,14 +163,15 @@ router.get('/session/:sessionID/media', async (req, res) => {
                 filename,
                 mimeType,
                 sourceID: item.id,
+                storyID
             });
 
             storedImages.push({
-                id: saved.id,
+                id: item.id,
                 url: saved.url,
                 filename,
                 mimeType,
-                sourceID: item.id,
+                alias: saved.alias
             });
         }
 

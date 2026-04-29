@@ -3,15 +3,14 @@ import {useState, useEffect, useRef} from 'react'
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
-import {
-    GenerateImage,
-    PollForPickedGooglePhoto,
-    UploadGooglePhotos,
-    WaitForPickedGooglePhoto
-} from '../services/Photos.js';
+import { GenerateImage, setImages } from '../services/Photos.js';
+
+import {changeCharacterAlias, fetchAllCharacters} from '../services/Characters.js';
 
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
+import GooglePhotosButton from '../components/GooglePhotosButton.jsx';
+import DisplayImages from "../components/ImageDisplay.jsx";
 
 /*
 * Code adapted from:
@@ -173,6 +172,17 @@ function Page() {
     const [generatedImage, setGeneratedImage] = useState(defaultImage);
     const [imageList, setImageList] = useState([]);
 
+    useEffect(() => {
+        async function loadCharacters() {
+            if(!username) return;
+
+            const characters = await fetchAllCharacters(username);
+
+            await setImages(setImageList, characters);
+        }
+        loadCharacters();
+    }, [username]);
+
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
         setAudioDescription(result);
@@ -181,23 +191,6 @@ function Page() {
     async function UploadText(AudioText) {
         const result = await GenerateImage(AudioText);
         setGeneratedImage(result);
-    }
-
-    async function HandleGooglePhotosUpload(){
-        const session =  await UploadGooglePhotos(username);
-        if(!session) return;
-
-        // wait until picker uri is closed/image selected, eventually backend will send image information for download
-        const picked = await PollForPickedGooglePhoto(username, session.sessionID);
-        if(!picked) return;
-
-        console.log(picked);
-
-        if(picked.primaryImageUrl) {
-            console.log("Setting Image");
-            setGeneratedImage(picked.primaryImageUrl);
-        }
-        setImageList((prev) => [...prev, ...(picked.images || [])]);
     }
 
     return (
@@ -222,19 +215,9 @@ function Page() {
             </div>
 
             <div id="ImagePortion">
-                <div id="ImageList">
-                    {imageList.map((img) => (
-                        <img
-                            key={img.id}
-                            src={img.url}
-                            alt={img.filename || "Picked image"}
-                            style={{ width: "120px", height: "120px" }}
-                            onClick={() => setGeneratedImage(img.url)}
-                        />
-                    ))}
-                </div>
+                <DisplayImages ID="PageImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
                 <button>Upload Character</button>
-                <button onClick={HandleGooglePhotosUpload}>Upload from Google Photos</button>
+                <GooglePhotosButton label="Upload from Google Photos" username={username} setImageList={setImageList} />
             </div>
         </div>
     );

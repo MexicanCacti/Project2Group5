@@ -8,6 +8,12 @@ async function GetSignedURL(file){
     });
 }
 
+
+
+/*
+Note: saving an image from non-google image will probably looks VERY similar to below
+ */
+
 /*
 https://docs.cloud.google.com/storage/docs/access-control/signed-urls?utm_source=chatgpt.com
 SignedURL basically is an authorized url request to download an item from the bucket
@@ -18,6 +24,7 @@ async function SaveGoogleImageToStorage({
     filename,
     mimeType,
     sourceID,
+    storyID
                                         }){
     const name = filename || `${sourceID}.jpg`;
     const ext = path.extname(name) || '.jpg';
@@ -25,17 +32,15 @@ async function SaveGoogleImageToStorage({
 
     const file = bucket.file(objectPath);
 
-    await file.save(imageBuffer, {
-        contentType: mimeType || 'image/jpeg',
-        metadata: {
-            username,
-            source: "google_photos",
-            sourceID
-        },
-        resumable: false,
-    });
+    let existingFile = await db
+        .collection('users')
+        .doc(username)
+        .collection('images')
+        .doc(sourceID)
+        .get();
 
-    const [signedURL] = await GetSignedURL(file)
+    // New file, save to bucket & firestore
+    if(!existingFile.exists){
 
     const docRef = await write_to_collection("users", username, {
         source: "google_photos",
@@ -47,10 +52,46 @@ async function SaveGoogleImageToStorage({
             createdAt: Date.now(),
         });
 
+        const [signedURL] = await GetSignedURL(file)
+
+        existingFile = await db
+            .collection("users")
+            .doc(username)
+            .collection("images")
+            .doc(sourceID)
+            .set({
+                source: "google_photos",
+                sourceID: sourceID,
+                filename: name,
+                mimeType: mimeType || "image/jpeg",
+                storagePath: objectPath,
+                publicUrl: signedURL,
+                createdAt: Date.now(),
+                alias: "Default"
+            });
+
+        existingFile = await db
+            .collection('users')
+            .doc(username)
+            .collection('images')
+            .doc(sourceID)
+            .get();
+    }
+
+    const imageData = existingFile.data();
+    const alias = imageData?.alias || "Default";
+    const signedURL = imageData?.publicUrl || (await GetSignedURL(file))[0];
+
+    const characterID = await SaveCharacter(username, sourceID, alias);
+
+    if(storyID){
+        await AddCharacterToStory(username, storyID, characterID)
+    }
+
+    // Return the ID of the file, the signed url,
     return {
-        id: docRef.id,
-        url: signedURL,
-        storagePath: objectPath
+        id: sourceID,
+        url: signedURL
     };
 }
 
