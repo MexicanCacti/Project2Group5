@@ -5,9 +5,11 @@ const serviceAccount = require("./serviceAccount.json");
 const databaseID = process.env.DATABASE_ID
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 const db = getFirestore(admin.app(), databaseID);
+const bucket = admin.storage().bucket();
 
-module.exports = { db };
+module.exports = { db, bucket };

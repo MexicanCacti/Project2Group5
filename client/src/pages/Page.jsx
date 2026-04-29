@@ -3,8 +3,12 @@ import {useState, useEffect, useRef} from 'react'
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
-import {GenerateImage} from '../services/Photos.js';
-import {UploadGooglePhotos} from "../services/Photos.js";
+import {
+    GenerateImage,
+    PollForPickedGooglePhoto,
+    UploadGooglePhotos,
+    WaitForPickedGooglePhoto
+} from '../services/Photos.js';
 
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
@@ -154,20 +158,20 @@ function AudioBox({ value, onChange }) {
     );
 }
 
-function ImageBox({ value, onChange }) {
+function ImageBox({ value }) {
     return (
         <img
             alt="Generated Image"
             src={value}
-            onChange={(e) => onChange(e.target.value)}
         />
-    )
+    );
 }
 
 function Page() {
     const { username, setUsername } = useUser();
     const [audioDescription, setAudioDescription] = useState('A man smiling while holding a puppy');
     const [generatedImage, setGeneratedImage] = useState(defaultImage);
+    const [imageList, setImageList] = useState([]);
 
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
@@ -179,15 +183,29 @@ function Page() {
         setGeneratedImage(result);
     }
 
+    async function HandleGooglePhotosUpload(){
+        const session =  await UploadGooglePhotos(username);
+        if(!session) return;
+
+        // wait until picker uri is closed/image selected, eventually backend will send image information for download
+        const picked = await PollForPickedGooglePhoto(username, session.sessionID);
+        if(!picked) return;
+
+        console.log(picked);
+
+        if(picked.primaryImageUrl) {
+            console.log("Setting Image");
+            setGeneratedImage(picked.primaryImageUrl);
+        }
+        setImageList((prev) => [...prev, ...(picked.images || [])]);
+    }
+
     return (
         <div id="Page">
             <TitleBar />
 
             <div id="PageImage">
-                <ImageBox
-                    value={generatedImage}
-                    onChange={setGeneratedImage}
-                />
+                <ImageBox value={generatedImage} />
             </div>
 
             <div id="AudioPortion">
@@ -205,10 +223,18 @@ function Page() {
 
             <div id="ImagePortion">
                 <div id="ImageList">
-                    <h3>Image List goes here</h3>
+                    {imageList.map((img) => (
+                        <img
+                            key={img.id}
+                            src={img.url}
+                            alt={img.filename || "Picked image"}
+                            style={{ width: "120px", height: "120px" }}
+                            onClick={() => setGeneratedImage(img.url)}
+                        />
+                    ))}
                 </div>
                 <button>Upload Character</button>
-                <button onClick={() => UploadGooglePhotos(username)}>Upload from Google Photos</button>
+                <button onClick={HandleGooglePhotosUpload}>Upload from Google Photos</button>
             </div>
         </div>
     );

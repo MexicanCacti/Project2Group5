@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const { CheckUserExists, CreateUser, DoPasswordHash, SaveOAuthToken } = require('../services/userfunctions');
+const { CheckUserExists, GetOAuthToken } = require('../services/userfunctions');
 const {CreateOAuthClient} = require('../services/oauth');
+const {SaveGoogleImageToStorage} = require('../services/photo');
 
 const {db} = require('../services/firestore');
 
+// Saves Picker session, used to later access/download images selected
 async function SaveSessionInformation(username, sessionData){
     await db.collection('users').doc(username).set({
         PickerSessionID: sessionData.id,
@@ -14,6 +16,14 @@ async function SaveSessionInformation(username, sessionData){
     }, {merge : true});
 }
 
+/*
+    Endpoint used to initalize the google photos pickerapi session.
+    -> Get OAuth Refresh Token
+    -> Obtain an access token
+    -> Use access token to being a picker session
+    -> Save picker session id & uri
+    -> Send to front-end to open window for user to select images from google photos
+ */
 router.post('/session', async (req, res) => {
     try{
         const { username } = req.body;
@@ -62,6 +72,119 @@ router.post('/session', async (req, res) => {
     } catch (err) {
         return res.status(500).json({error: "Failed to create picker session", details: err.message})
     }
+})
+
+// Get the sessionID of the picker session, then make a request to the picker server to check if the selected photos are ready
+// for download. If they are, then go ahead and retrieve the metadata of the available photos & save one-by-one to the cloud bucket.
+// Once the images are saved to the cloud bucket, generated a signed url so frontend can access & download for displaying
+router.get('/session/:sessionID/media', async (req, res) => {
+    try{
+        const {sessionID} = req.params;
+        const {username} = req.query;
+
+        if(!sessionID){
+            return res.status(400).json({error: "No session ID provided"});
+        }
+
+        if(!username){
+            return res.status(400).json({error: "No Username provided"});
+        }
+
+        const accessToken = await GetOAuthToken(username);
+
+        if(!accessToken){
+            return res.status(401).json({error: "Access token not obtained"});
+        }
+
+        const pickerStatus = await fetch(`https://photospicker.googleapis.com/v1/sessions/${encodeURIComponent(sessionID)}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        });
+
+        const pickerData = await pickerStatus.json();
+
+        if(!pickerStatus.ok){
+            return res.status(pickerStatus.status).json(pickerData);
+        }
+
+        if (!pickerData.mediaItemsSet) {
+            return res.json({
+                ready: false,
+                sessionID,
+                mediaItemsSet: false,
+            });
+        }
+
+        const mediaRes = await fetch(
+            `https://photospicker.googleapis.com/v1/mediaItems?sessionId=${encodeURIComponent(sessionID)}`,
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                }
+            }
+        );
+
+        const mediaData = await mediaRes.json();
+
+        if (!mediaRes.ok) {
+            return res.status(mediaRes.status).json(mediaData);
+        }
+
+        const storedImages = [];
+
+        // So mediaData should have a list of all the user's selected Items, go one-by-one and save to cloud bucket
+        for (const item of mediaData.mediaItems || []) {
+            const baseUrl = item?.mediaFile?.baseUrl;
+            const filename = item?.mediaFile?.filename || `${item.id}.jpg`;
+            const mimeType = item?.mediaFile?.mimeType || "image/jpeg";
+
+            if (!baseUrl) continue;
+
+
+            const photoRes = await fetch(`${baseUrl}=w1200-h1200`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            if (!photoRes.ok) {
+                continue;
+            }
+
+            const arrayBuffer = await photoRes.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const saved = await SaveGoogleImageToStorage({
+                username,
+                imageBuffer: buffer,
+                filename,
+                mimeType,
+                sourceID: item.id,
+            });
+
+            storedImages.push({
+                id: saved.id,
+                url: saved.url,
+                filename,
+                mimeType,
+                sourceID: item.id,
+            });
+        }
+
+        return res.json({
+            ready: true,
+            sessionID,
+            mediaItemsSet: true,
+            primaryImageUrl: storedImages[0]?.url || null,
+            images: storedImages,
+        });
+    } catch (err) {
+        return res.status(500).json({error: "Failed to fetch picked media", details: err.message});
+    }
+
 })
 
 module.exports = router;
