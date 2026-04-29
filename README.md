@@ -37,6 +37,7 @@ npm run rebuild
 - SESSION_SECRET: Secret for state to send with OAuth requests
 - REDIRECT_URL: URL to process the OAUTH call back
 - FRONTEND_OAUTH_COMPLETE_URL: Where to redirect the client once OAuth completes
+- FIREBASE_STORAGE_BUCKET: URL to bucket to store images
 
 #### Client /client/.env
 - No env required yet
