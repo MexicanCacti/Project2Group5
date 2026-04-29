@@ -24,6 +24,10 @@ export default defineConfig({
       "/googlephotos": {
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
+      },
+      "/character": {
+        target: "http://server:" + SERVER_PORT,
+        changeOrigin: true,
       }
     },
   },

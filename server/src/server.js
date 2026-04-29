@@ -15,7 +15,7 @@ app.use(cors({
 const geminiRouter = require("../routes/gemini");
 const userRouter = require("../routes/user");
 const googlePhotosRouter = require("../routes/googlephotos");
-
+const characterRouter = require("../routes/character")
 const clientPath = path.join(__dirname, '../../client/src');
 app.use(express.static(clientPath));
 
@@ -37,6 +37,7 @@ app.use(session({
 app.use("/gemini", geminiRouter);
 app.use("/user", userRouter);
 app.use("/googlephotos", googlePhotosRouter);
+app.use("/charater", characterRouter)
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
