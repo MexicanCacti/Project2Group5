@@ -1,7 +1,39 @@
+import {useState} from "react";
 import TitleBar from "../components/TitleBar.jsx";
-import '../styles/Characters.css'
+import '../styles/Characters.css';
+import {uploadCharacter} from "../services/Characters.js";
 
 function Characters() {
+    const [charGenHidden, setCharGenHidden] = useState(false);
+    const [charGenName, setCharGenName] = useState('');
+    const [charGenRefFile, setCharGenRefFile] = useState('');
+    const [charGenFileError, setCharGenFileError] = useState('');
+
+    {/* Write a new character to the database*/}
+    const handleSubmit = (e) => {
+        e.preventDefault() // Prevent page reload
+        uploadCharacter(charGenName, charGenRefFile);
+    };
+
+    const toggleForm = () => {
+        setCharGenHidden((prev) => !prev);
+    };
+
+    const handleFileChange = (e) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+        // Example validation: limit file size to 5MB
+        if (selectedFile.size > 5 * 1024 * 1024) {
+            setCharGenFileError("File size must be less than 5MB.");
+            setCharGenRefFile('');
+            return;
+        }
+        setCharGenRefFile(selectedFile);
+        setCharGenFileError('');
+        }
+    };
+
+    // Handle file upload
     return (
         <div id="Characters">
             <TitleBar />
@@ -11,8 +43,38 @@ function Characters() {
                 <div id="CharactersIntro">
                     <h1>Character Library</h1>
                     <p>Import images and assign aliases to use in your storybooks</p>
+                    
                     {/*Button should do a dialog pop-up box to let the user upload or provide a link to an image?*/}
-                    <button>Add Character</button>
+                    <button onClick={() => {toggleForm();}}>Add Character</button>
+
+                    {/* */}
+                    {charGenHidden && (
+                        <form onSubmit={(e) => {
+                                e.handleSubmit();
+                                e.toggleForm();}}
+                            >
+                            <label>
+                                Character Name:
+                                <input
+                                    type="text"
+                                    name="characterName"
+                                    value={charGenName}
+                                    onChange={(e) => setCharGenName(e.target.value)}
+                                />
+                            </label>
+                            <label>
+                                {/*Todo - change this to use a file*/}
+                                Character Reference Image:
+                                <input
+                                    type="file"
+                                    name="characterReference"
+                                    onChange={handleFileChange}
+                                />
+                            </label>
+                            <button type="submit">Submit</button>
+                        </form>
+                    )}
+                    
                 </div>
 
             </div>
