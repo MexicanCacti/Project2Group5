@@ -5,11 +5,12 @@ import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
 import { GenerateImage, setImages } from '../services/Photos.js';
 
-import {fetchAllCharacters} from '../services/Characters.js';
+import {changeCharacterAlias, fetchAllCharacters} from '../services/Characters.js';
 
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
 import GooglePhotosButton from '../components/GooglePhotosButton.jsx';
+import DisplayImages from "../components/ImageDisplay.jsx";
 
 /*
 * Code adapted from:
@@ -214,17 +215,7 @@ function Page() {
             </div>
 
             <div id="ImagePortion">
-                <div id="ImageList">
-                    {imageList.map((img) => (
-                        <img
-                            key={img.id}
-                            src={img.url}
-                            alt="Picked image"
-                            style={{ width: "120px", height: "120px" }}
-                            onClick={() => setGeneratedImage(img.url)}
-                        />
-                    ))}
-                </div>
+                <DisplayImages ID="PageImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
                 <button>Upload Character</button>
                 <GooglePhotosButton label="Upload from Google Photos" username={username} setImageList={setImageList} />
             </div>

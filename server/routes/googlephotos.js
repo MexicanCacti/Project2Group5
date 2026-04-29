@@ -165,11 +165,11 @@ router.get('/session/:sessionID/media', async (req, res) => {
             });
 
             storedImages.push({
-                id: saved.id,
+                id: item.id,
                 url: saved.url,
                 filename,
                 mimeType,
-                sourceID: item.id,
+                alias: saved.alias
             });
         }
 

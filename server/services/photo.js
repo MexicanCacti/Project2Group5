@@ -58,7 +58,7 @@ async function SaveGoogleImageToStorage({
             .doc(sourceID)
             .set({
                 source: "google_photos",
-                sourceID,
+                sourceID: sourceID,
                 filename: name,
                 mimeType: mimeType || "image/jpeg",
                 storagePath: objectPath,
@@ -70,7 +70,7 @@ async function SaveGoogleImageToStorage({
 
     // Return the ID of the file, the signed url,
     return {
-        id: existingFile.id,
+        id: sourceID,
         url: signedURL
     };
 }
@@ -96,20 +96,4 @@ async function GetAllUserCharacters(username) {
         .filter((img) => img.url); // dont return any img with an undefined publicUrl
 }
 
-async function ChangeCharacterAlias(username, alias, sourceID){
-    let existingFile = await db
-        .collection('users')
-        .doc(username)
-        .collection('images')
-        .doc(sourceID)
-        .get();
-
-    if(!existingFile.exists){
-        return false;
-    }
-
-    existingFile.alias = alias;
-    return true;
-}
-
-module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters, ChangeCharacterAlias}
+module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters}

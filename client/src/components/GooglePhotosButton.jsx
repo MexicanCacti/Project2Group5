@@ -1,7 +1,6 @@
 import {addImages, PollForPickedGooglePhoto, UploadGooglePhotos} from "../services/Photos.js";
 
 async function HandleGooglePhotosUpload({username, setImageList}){
-    console.log({username});
     const session =  await UploadGooglePhotos(username);
     if(!session) return;
 
