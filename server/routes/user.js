@@ -8,6 +8,8 @@ const {HandleOAuthCallback, InitOAuth} = require("../services/oauth");
 
 const {write_to_collection, read_collection} = require('../services/firestore');
 
+const {GetAllUserCharacters} = require('../services/storage');
+
 // A test route to ensure database connection works
 router.get("/firestore-test", async (req, res) => {
     try {

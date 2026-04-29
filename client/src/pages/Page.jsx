@@ -10,7 +10,7 @@ import {changeCharacterAlias, fetchAllCharacters} from '../services/Characters.j
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
 import GooglePhotosButton from '../components/GooglePhotosButton.jsx';
-import DisplayImages from "../components/ImageDisplay.jsx";
+import DisplayCharacters from "../components/CharacterDisplay.jsx";
 
 /*
 * Code adapted from:
@@ -215,7 +215,7 @@ function Page() {
             </div>
 
             <div id="ImagePortion">
-                <DisplayImages ID="PageImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
+                <DisplayCharacters ID="PageImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
                 <button>Upload Character</button>
                 <GooglePhotosButton label="Upload from Google Photos" username={username} setImageList={setImageList} />
             </div>

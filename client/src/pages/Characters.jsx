@@ -5,7 +5,7 @@ import {fetchAllCharacters, uploadCharacter} from "../services/Characters.js";
 import GooglePhotosButton from '../components/GooglePhotosButton.jsx'
 import {useUser} from "../components/UserContext.jsx";
 import {setImages} from "../services/Photos.js";
-import DisplayImages from '../components/ImageDisplay.jsx';
+import DisplayCharacters from '../components/CharacterDisplay.jsx';
 import {changeCharacterAlias} from '../services/Characters.js';
 
 function Characters() {
@@ -22,7 +22,6 @@ function Characters() {
             if(!username) return;
 
             const characters = await fetchAllCharacters(username);
-            console.log(characters.images);
 
             await setImages(setImageList, characters);
         }
@@ -105,7 +104,7 @@ function Characters() {
             {/*Also add button to allow user to add a character, similar to one in the above div*/}
             {/*When listing characters, maybe also include what stories the character is a part of?*/}
             <div id="CharactersBox">
-                <DisplayImages ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias} DisplayStories={true}/>
+                <DisplayCharacters ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias} DisplayStories={true}/>
             </div>
 
         </div>

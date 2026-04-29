@@ -4,13 +4,13 @@ const bcrypt = require("bcryptjs");
 const saltRounds = 1;
 
 // DB already connected, see firestore.js, all db transactions use db
-const {db, write_to_collection, update_collection} = require('./firestore');
+const {db, write_to_collection, update_collection, read_collection} = require('./firestore');
 
 async function CheckUserExists(username) {
     // Note: Username are the docIDs, guaranteed to be unique
     // const doc = await db.collection('users').doc(username).get();
-    const doc = await read_collection("users", username);
-    return doc.exists ? doc : null;
+    const userDoc = await read_collection("users", username);
+    return userDoc.exists ? userDoc : null;
 }
 
 async function CreateUser(username, password) {

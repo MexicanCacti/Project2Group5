@@ -12,20 +12,19 @@ admin.initializeApp({
 const db = getFirestore(admin.app(), databaseID);
 const bucket = admin.storage().bucket();
 
-async function write_document(collection, document, arg) {
+async function write_document(collection, document, args) {
     const ref = db.collection(collection).doc(document);
-    await ref.set(...args);
+    await ref.set(args);
 }
 
-async function update_collection(collection, document, arg) {
+async function update_collection(collection, document, args) {
     const ref = db.collection(collection).doc(document);
     await ref.set(args, { merge: true });
 }
 
 async function read_document(collection, document,) {
     const ref = db.collection(collection).doc(document);
-    const doc = await ref.get();
-    return doc.data();
+    return await ref.get();
 }
 
 async function delete_collection(collection, document) {
