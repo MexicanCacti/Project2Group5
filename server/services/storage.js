@@ -2,6 +2,29 @@ const {db} = require('../services/firestore');
 const admin = require("firebase-admin");
 
 
+async function AddStory(username, title, description){
+    // Create a new story document
+    const storyRef = db
+        .collection('users')
+        .doc(username)
+        .collection('stories')
+        .doc();
+
+    // Fill in the story attributes
+    await storyRef.set({
+        storyID: storyRef.id,
+        title: title,
+        description: description,
+        characterList: [],
+        pageCount: 0,
+        pageList: [],
+    })
+
+    return {
+        storyID: storyRef.id,
+        storyTitle: title,
+    }
+}
 
 /*
 * Character collection is a list of all the user's uploaded characters
@@ -18,6 +41,7 @@ async function SaveCharacter(username, sourceID, alias){
 
     await characterRef.set({
         sourceID: sourceID,
+        storyList: []
     }, { merge: true });
 
     return characterRef.id;
@@ -27,7 +51,7 @@ async function AddCharacterToStory(username, storyID, characterID){
     const storyRef = db
         .collection('users')
         .doc(username)
-        .collection('storybooks')
+        .collection('stories')
         .doc(storyID);
 
     const storyDoc = await storyRef.get();
@@ -49,13 +73,16 @@ async function AddCharacterToStory(username, storyID, characterID){
     }
 
     // Appends the characterID to the list of character IDs of story, function call prevents duplicates
-    await storyRef.update({
-        characterIDs: admin.firestore.FieldValue.arrayUnion( characterID),
+    await storyRef.set({
+        characterList: admin.firestore.FieldValue.arrayUnion(characterID),
     }, {merge: true});
 
     // Appends the storyID to the list of stories the character is included in
     await characterRef.set({
-        storyList: admin.firestore.FieldValue.arrayUnion(storyID)
+        storyList: admin.firestore.FieldValue.arrayUnion({
+            id: storyID,
+            title: storyDoc.data().title
+        })
     }, {merge: true});
 
 }
@@ -122,4 +149,4 @@ async function GetAllUserCharacters(username) {
     );
 }
 
-module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters}
+module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, AddStory}

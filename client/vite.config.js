@@ -28,6 +28,10 @@ export default defineConfig({
       "/character": {
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
+      },
+      "/story": {
+        target: "http://server:" + SERVER_PORT,
+        changeOrigin: true,
       }
     },
   },

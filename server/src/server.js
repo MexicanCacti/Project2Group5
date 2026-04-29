@@ -16,6 +16,7 @@ const geminiRouter = require("../routes/gemini");
 const userRouter = require("../routes/user");
 const googlePhotosRouter = require("../routes/googlephotos");
 const characterRouter = require("../routes/character")
+const storyRouter = require("../routes/story");
 const clientPath = path.join(__dirname, '../../client/src');
 app.use(express.static(clientPath));
 
@@ -38,6 +39,7 @@ app.use("/gemini", geminiRouter);
 app.use("/user", userRouter);
 app.use("/googlephotos", googlePhotosRouter);
 app.use("/character", characterRouter)
+app.use('/story', storyRouter)
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));

@@ -5,6 +5,7 @@ import {useUser} from "../components/UserContext.jsx";
 import {setImages} from "../services/Photos.js";
 import {fetchAllCharacters, changeCharacterAlias} from "../services/Characters.js";
 import DisplayCharacters from "../components/CharacterDisplay.jsx";
+import {createStory} from "../services/Storybooks.js";
 
 
 function CreateStory() {
@@ -14,7 +15,7 @@ function CreateStory() {
     const [selectedCharacters, setSelectedCharacters] = useState([]);
     const {username} = useUser();
 
-    // Load the Character list for seleciton
+    // Load the Character list for selection
     useEffect(() => {
         async function loadCharacters() {
             if(!username) return;
@@ -46,14 +47,16 @@ function CreateStory() {
         });
     }
 
-    function handleCreateStory(){
+    async function handleCreateStory(e){
+        e.preventDefault();
+        const storyCreation = await createStory(username, title, description, selectedCharacters);
 
     }
 
     return (
         <div id="CreateStory">
             <TitleBar />
-            <form onSubmit={handleCreateStory} id="CreateStoryForm">
+            <form onSubmit={(e) => handleCreateStory(e)} id="CreateStoryForm">
                 <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
