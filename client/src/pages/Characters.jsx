@@ -22,6 +22,7 @@ function Characters() {
             if(!username) return;
 
             const characters = await fetchAllCharacters(username);
+            console.log(characters.images);
 
             await setImages(setImageList, characters);
         }
@@ -104,7 +105,7 @@ function Characters() {
             {/*Also add button to allow user to add a character, similar to one in the above div*/}
             {/*When listing characters, maybe also include what stories the character is a part of?*/}
             <div id="CharactersBox">
-                <DisplayImages ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
+                <DisplayImages ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias} DisplayStories={true}/>
             </div>
 
         </div>

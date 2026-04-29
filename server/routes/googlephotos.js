@@ -80,7 +80,8 @@ router.post('/session', async (req, res) => {
 router.get('/session/:sessionID/media', async (req, res) => {
     try{
         const {sessionID} = req.params;
-        const {username} = req.query;
+        let {username, storyID} = req.query;
+        if(!storyID) storyID = null;
 
         if(!sessionID){
             return res.status(400).json({error: "No session ID provided"});
@@ -162,6 +163,7 @@ router.get('/session/:sessionID/media', async (req, res) => {
                 filename,
                 mimeType,
                 sourceID: item.id,
+                storyID
             });
 
             storedImages.push({

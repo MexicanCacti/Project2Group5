@@ -1,5 +1,7 @@
 const path = require('path');
 const {bucket, db} = require('./firestore');
+const {SaveCharacter, AddCharacterToStory} = require('./storage');
+
 
 async function GetSignedURL(file){
     return await file.getSignedUrl({
@@ -7,6 +9,8 @@ async function GetSignedURL(file){
         expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
     });
 }
+
+
 
 /*
 Note: saving an image from non-google image will probably looks VERY similar to below
@@ -22,6 +26,7 @@ async function SaveGoogleImageToStorage({
     filename,
     mimeType,
     sourceID,
+    storyID
                                         }){
     const name = filename || `${sourceID}.jpg`;
     const ext = path.extname(name) || '.jpg';
@@ -36,12 +41,11 @@ async function SaveGoogleImageToStorage({
         .doc(sourceID)
         .get();
 
-    const [signedURL] = await GetSignedURL(file)
-
     // New file, save to bucket & firestore
     if(!existingFile.exists){
+
         await file.save(imageBuffer, {
-            contentType: mimeType || 'image/jpeg',
+            contentType: mimeType,
             metadata: {
                 username,
                 source: "google_photos",
@@ -50,6 +54,7 @@ async function SaveGoogleImageToStorage({
             resumable: false,
         });
 
+        const [signedURL] = await GetSignedURL(file)
 
         existingFile = await db
             .collection("users")
@@ -66,6 +71,23 @@ async function SaveGoogleImageToStorage({
                 createdAt: Date.now(),
                 alias: "Default"
             });
+
+        existingFile = await db
+            .collection('users')
+            .doc(username)
+            .collection('images')
+            .doc(sourceID)
+            .get();
+    }
+
+    const imageData = existingFile.data();
+    const alias = imageData?.alias || "Default";
+    const signedURL = imageData?.publicUrl || (await GetSignedURL(file))[0];
+
+    const characterID = await SaveCharacter(username, sourceID, alias);
+
+    if(storyID){
+        await AddCharacterToStory(username, storyID, characterID)
     }
 
     // Return the ID of the file, the signed url,
@@ -75,25 +97,4 @@ async function SaveGoogleImageToStorage({
     };
 }
 
-async function GetAllUserCharacters(username) {
-    // Look in 'users' collection based on username, then the collection containing all the image storage info
-    const characterSnapshot = await db
-        .collection("users")
-        .doc(username)
-        .collection("images")
-        .orderBy("createdAt", "desc")
-        .get();
-
-    // Normalize the return output
-    return characterSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-            id: doc.id,
-            url: data.publicUrl,
-            alias: data.alias
-        };
-    })
-        .filter((img) => img.url); // dont return any img with an undefined publicUrl
-}
-
-module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters}
+module.exports = {SaveGoogleImageToStorage}

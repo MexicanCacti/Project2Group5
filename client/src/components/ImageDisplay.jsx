@@ -1,6 +1,6 @@
 import DisplayCharacter from "./CharacterDisplay";
 
-function DisplayImages({ID, username, ImageList, OnImageClick, OnChangeAlias}){
+function DisplayImages({ID, username, ImageList, OnImageClick, OnChangeAlias, DisplayStories}){
 
     return(
         <div id={ID}>
@@ -12,8 +12,10 @@ function DisplayImages({ID, username, ImageList, OnImageClick, OnChangeAlias}){
                     username={username}
                     CharacterAlias={img.alias || ""}
                     CharacterImage={img.url}
+                    CharacterStories={ImageList.storyList}
                     OnImageClick={() => OnImageClick?.(img.id, img.url)}
                     OnChangeAlias={OnChangeAlias}
+                    DisplayStories={DisplayStories}
                 />
             ))}
         </div>

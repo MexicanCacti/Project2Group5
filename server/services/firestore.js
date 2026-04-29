@@ -12,4 +12,4 @@ admin.initializeApp({
 const db = getFirestore(admin.app(), databaseID);
 const bucket = admin.storage().bucket();
 
-module.exports = { db, bucket };
+module.exports = { db, bucket , admin};

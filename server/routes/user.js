@@ -7,7 +7,7 @@ const { CheckUserExists, CreateUser, DoPasswordHash, SaveOAuthToken } = require(
 const {HandleOAuthCallback, InitOAuth} = require("../services/oauth");
 
 const {db} = require('../services/firestore');
-const {GetAllUserCharacters} = require("../services/photo");
+const {GetAllUserCharacters} = require("../services/storage");
 
 // A test route to ensure database connection works
 router.get("/firestore-test", async (req, res) => {
@@ -162,6 +162,7 @@ router.get('/characters', async (req, res) => {
         }
 
         const characters = await GetAllUserCharacters(username);
+
         return res.json({ images: characters});
 
     } catch(err) {
