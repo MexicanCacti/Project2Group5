@@ -85,10 +85,8 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
     );
 
     const data = await res.json();
-    console.log("poll response", data);
 
     if (!res.ok) {
-        console.error("poll failed", data);
         return null;
     }
 

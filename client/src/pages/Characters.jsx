@@ -5,6 +5,8 @@ import {fetchAllCharacters, uploadCharacter} from "../services/Characters.js";
 import GooglePhotosButton from '../components/GooglePhotosButton.jsx'
 import {useUser} from "../components/UserContext.jsx";
 import {setImages} from "../services/Photos.js";
+import DisplayImages from '../components/ImageDisplay.jsx';
+import {changeCharacterAlias} from '../services/Characters.js';
 
 function Characters() {
     const [charGenHidden, setCharGenHidden] = useState(false);
@@ -102,18 +104,7 @@ function Characters() {
             {/*Also add button to allow user to add a character, similar to one in the above div*/}
             {/*When listing characters, maybe also include what stories the character is a part of?*/}
             <div id="CharactersBox">
-                <div id="ImageList">
-                    {/* See backend functions for retrieving photos for changing the attributes each img stores */}
-                    {imageList.map((img) => (
-                        <img
-                            key={img.id}
-                            src={img.url}
-                            alt="Image"
-                            style={{ width: "120px", height: "120px" }}
-                        />
-                    ))}
-                </div>
-
+                <DisplayImages ID="CharacterImages" username={username} ImageList={imageList} OnChangeAlias={changeCharacterAlias}/>
             </div>
 
         </div>

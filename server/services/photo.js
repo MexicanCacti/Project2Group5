@@ -9,6 +9,10 @@ async function GetSignedURL(file){
 }
 
 /*
+Note: saving an image from non-google image will probably looks VERY similar to below
+ */
+
+/*
 https://docs.cloud.google.com/storage/docs/access-control/signed-urls?utm_source=chatgpt.com
 SignedURL basically is an authorized url request to download an item from the bucket
  */
@@ -60,6 +64,7 @@ async function SaveGoogleImageToStorage({
                 storagePath: objectPath,
                 publicUrl: signedURL,
                 createdAt: Date.now(),
+                alias: "Default"
             });
     }
 
@@ -85,9 +90,26 @@ async function GetAllUserCharacters(username) {
         return {
             id: doc.id,
             url: data.publicUrl,
+            alias: data.alias
         };
     })
         .filter((img) => img.url); // dont return any img with an undefined publicUrl
 }
 
-module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters}
+async function ChangeCharacterAlias(username, alias, sourceID){
+    let existingFile = await db
+        .collection('users')
+        .doc(username)
+        .collection('images')
+        .doc(sourceID)
+        .get();
+
+    if(!existingFile.exists){
+        return false;
+    }
+
+    existingFile.alias = alias;
+    return true;
+}
+
+module.exports = {SaveGoogleImageToStorage, GetAllUserCharacters, ChangeCharacterAlias}
