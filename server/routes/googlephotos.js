@@ -5,15 +5,15 @@ const { CheckUserExists, GetOAuthToken } = require('../services/userfunctions');
 const {CreateOAuthClient} = require('../services/oauth');
 const {SaveGoogleImageToStorage} = require('../services/photo');
 
-const {db} = require('../services/firestore');
+const {write_to_collection, update_collection} = require('../services/firestore');
 
 // Saves Picker session, used to later access/download images selected
 async function SaveSessionInformation(username, sessionData){
-    await db.collection('users').doc(username).set({
+    await update_collection("users", username, {
         PickerSessionID: sessionData.id,
         PickerSessionURI: sessionData.pickerUri,
         PickerSessionCreationTime: Date.now()
-    }, {merge : true});
+    } );
 }
 
 /*

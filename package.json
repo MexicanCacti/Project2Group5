@@ -12,6 +12,7 @@
     "gcp-build": "cd client && npm install && npm run build"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^8.5.0",
     "@google/genai": "^1.50.1",
     "cors": "^2.8.6",
     "express": "^5.2.1"

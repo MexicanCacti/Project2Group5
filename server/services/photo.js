@@ -1,7 +1,5 @@
 const path = require('path');
-const {bucket, db} = require('./firestore');
-const {SaveCharacter, AddCharacterToStory} = require('./storage');
-
+const {bucket, db, write_to_collection, read_collection} = require('./firestore');
 
 async function GetSignedURL(file){
     return await file.getSignedUrl({
@@ -44,14 +42,14 @@ async function SaveGoogleImageToStorage({
     // New file, save to bucket & firestore
     if(!existingFile.exists){
 
-        await file.save(imageBuffer, {
-            contentType: mimeType,
-            metadata: {
-                username,
-                source: "google_photos",
-                sourceID
-            },
-            resumable: false,
+    const docRef = await write_to_collection("users", username, {
+        source: "google_photos",
+            sourceID,
+            filename: name,
+            mimeType: mimeType || "image/jpeg",
+            storagePath: objectPath,
+            publicUrl: signedURL,
+            createdAt: Date.now(),
         });
 
         const [signedURL] = await GetSignedURL(file)

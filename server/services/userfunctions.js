@@ -4,19 +4,24 @@ const bcrypt = require("bcryptjs");
 const saltRounds = 1;
 
 // DB already connected, see firestore.js, all db transactions use db
-const {db} = require('./firestore');
+const {db, write_to_collection, update_collection} = require('./firestore');
 
 async function CheckUserExists(username) {
     // Note: Username are the docIDs, guaranteed to be unique
-    const doc = await db.collection('users').doc(username).get();
+    // const doc = await db.collection('users').doc(username).get();
+    const doc = await read_collection("users", username);
     return doc.exists ? doc : null;
 }
 
 async function CreateUser(username, password) {
     //Goes to the collection "user", sets the DocID to be username, then sets the username & password fields
-    const docRef = db.collection("users").doc(username);
+    // const docRef = db.collection("users").doc(username);
 
-    await docRef.set({
+    // await docRef.set({
+    //     username: username,
+    //     password: password
+    // });
+    await write_to_collection("users", username, {
         username: username,
         password: password
     });
@@ -29,14 +34,20 @@ async function DoPasswordHash(password){
 }
 
 async function SaveOAuthToken(username, refreshToken, expiryTime) {
-    const update = {
+    // const update = {
+    //     photosConnected: true,
+    //     connectedAt: Date.now(),
+    //     refreshToken: refreshToken,
+    //     refreshExpire: expiryTime
+    // };
+
+    // await db.collection('users').doc(username).set(update, set);
+    await update_collection("users", username, {
         photosConnected: true,
         connectedAt: Date.now(),
         refreshToken: refreshToken,
         refreshExpire: expiryTime
-    };
-
-    await db.collection('users').doc(username).set(update, { merge: true });
+    });
 }
 
 /*
