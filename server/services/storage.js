@@ -88,7 +88,7 @@ async function AddCharacterToStory(username, storyID, characterID){
 }
 
 /*
-* Note for storyList, this backend function looks up every story and create a new list that has the {id, title}
+*
 * This is needed for displaying on the front end
  */
 async function GetAllUserCharacters(username) {
@@ -128,4 +128,24 @@ async function GetAllUserCharacters(username) {
     );
 }
 
-module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, AddStory}
+async function GetAllUserStories(username) {
+    const storySnapshot = await db
+        .collection("users")
+        .doc(username)
+        .collection("stories")
+        .get();
+
+    return storySnapshot.docs.map((storyDoc) => {
+        const storyData = storyDoc.data();
+
+        return{
+            id: storyDoc.id,
+            title: storyData.title,
+            description: storyData.description || "",
+            pageCount: storyData.pageCount || 0
+        };
+    });
+}
+
+
+module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, GetAllUserStories, AddStory}

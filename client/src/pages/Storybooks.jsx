@@ -1,14 +1,30 @@
 import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Storybooks.css'
 import NavButton from "../components/NavButton.jsx";
+import {useEffect, useState} from "react";
+import {fetchAllStories} from "../services/Storybooks.js";
 
+import {useUser} from "../components/UserContext.jsx";
 function Storybooks() {
+    const [stories, setStories] = useState([]);
+    const {username} = useUser();
+
+    // On page load, retrieves every storybook a user created
+    useEffect(() => {
+        async function loadStories() {
+            if(!username) return;
+
+            const stories = await fetchAllStories(username);
+            setStories(stories.stories)
+        }
+        loadStories();
+    }, [username]);
+
     return (
         <div id="Stories">
             <TitleBar />
 
             <div id="StoriesContent">
-
                 <div id="StoriesIntro">
                     <h1>My Storybooks</h1>
                     <p>View and manage your created storybooks</p>
@@ -19,20 +35,26 @@ function Storybooks() {
                     />
                 </div>
 
-                {/*Backend call to get all the users stories & display them, each one should have...
-                    First Page Image, Title, Description, Number Pages, Button to take to create story w/ loaded data
-                 */
-                }
                 <div id="StoriesBox">
-                    <NavButton
-                        label="Create New Story"
-                        id="StoriesCreateNav"
-                        destination={"/create"}
-                    />
+                    {stories.length === 0 ? (
+                        <p>No storybooks found.</p>
+                    ) : (
+                        stories.map((story) => (
+                            <div key={story.id} className="StoryBox">
+                                <h2>{story.title || "Untitled Story"}</h2>
+                                <p>{story.description || "No description"}</p>
+                                <p>Pages: {story.pageCount}</p>
+
+                                <NavButton
+                                    label="Open"
+                                    id={`open-${story.id}`}
+                                    destination={`/stories/${story.id}/0`}
+                                />
+                            </div>
+                        ))
+                    )}
                 </div>
-
             </div>
-
         </div>
     );
 }
