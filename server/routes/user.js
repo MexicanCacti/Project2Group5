@@ -6,34 +6,25 @@ const { CheckUserExists, CreateUser, DoPasswordHash, SaveOAuthToken } = require(
 
 const {HandleOAuthCallback, InitOAuth} = require("../services/oauth");
 
-const {db} = require('../services/firestore');
+const {write_to_collection, read_collection} = require('../services/firestore');
 
 // A test route to ensure database connection works
 router.get("/firestore-test", async (req, res) => {
     try {
-        const docRef = db.collection("users").doc("alovelace");
-
-        await docRef.set({
+        await write_to_collection("users", "alovelace", {
             first: "Ada",
             last: "Lovelace",
             born: 1815
         });
-
-        const aTuringRef = db.collection("users").doc("aturing");
-
-        await aTuringRef.set({
+        await write_to_collection("users", "aturing", {
             first: "Alan",
             middle: "Mathison",
             last: "Turing",
             born: 1912
         });
 
-        const snapshot = await db.collection("users").get();
-        const docs = [];
-
-        snapshot.forEach((doc) => {
-            docs.push({ id: doc.id, ...doc.data() });
-        });
+        await read_collection("users", "alovelace")
+        await read_collection("users", "aturing")
 
         return res.json({
             ok: true,

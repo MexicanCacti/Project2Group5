@@ -1,5 +1,5 @@
 const path = require('path');
-const {bucket, db} = require('./firestore');
+const {bucket, db, write_to_collection, read_collection} = require('./firestore');
 
 async function GetSignedURL(file){
     return await file.getSignedUrl({
@@ -37,12 +37,8 @@ async function SaveGoogleImageToStorage({
 
     const [signedURL] = await GetSignedURL(file)
 
-    const docRef = await db
-        .collection("users")
-        .doc(username)
-        .collection("images")
-        .add({
-            source: "google_photos",
+    const docRef = await write_to_collection("users", username, {
+        source: "google_photos",
             sourceID,
             filename: name,
             mimeType: mimeType || "image/jpeg",
