@@ -1,7 +1,7 @@
 import DisplayCharacter from "./CharacterBox.jsx";
 
 function DisplayCharacters({ID, username, ImageList, OnImageClick, OnChangeAlias, DisplayStories}){
-
+    console.log(ImageList)
     return(
         <div id={ID}>
             {ImageList.map((img) => (
@@ -12,7 +12,7 @@ function DisplayCharacters({ID, username, ImageList, OnImageClick, OnChangeAlias
                     username={username}
                     CharacterAlias={img.alias || ""}
                     CharacterImage={img.url}
-                    CharacterStories={ImageList.storyList}
+                    CharacterStories={img.storyList}
                     OnImageClick={() => OnImageClick?.(img.id, img.url)}
                     OnChangeAlias={OnChangeAlias}
                     DisplayStories={DisplayStories}

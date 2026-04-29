@@ -117,32 +117,11 @@ async function GetAllUserCharacters(username) {
             if (!imageDoc.exists) return null;
 
             const imageData = imageDoc.data();
-            const storyIDs = characterData.storyList || [];
-
-            const storyNames = await Promise.all(
-                storyIDs.map(async (storyID) => {
-                    const storyDoc = await db
-                        .collection("users")
-                        .doc(username)
-                        .collection("storybooks")
-                        .doc(storyID)
-                        .get();
-
-                    if (!storyDoc.exists) return null;
-
-                    const storyData = storyDoc.data();
-
-                    return {
-                        id: storyID,
-                        title: storyData.title || "Untitled",
-                    };
-                })
-            );
 
             return {
                 id: characterID,
                 alias: imageData.alias,
-                storyList: storyNames,
+                storyList: characterData.storyList || [],
                 url: imageData.publicUrl,
             };
         })
