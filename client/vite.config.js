@@ -29,7 +29,15 @@ export default defineConfig({
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
       },
+      "/character/upload": {
+        target: "http://server:" + SERVER_PORT,
+        changeOrigin: true,
+      },
       "/story": {
+        target: "http://server:" + SERVER_PORT,
+        changeOrigin: true,
+      },
+      "/characters": {
         target: "http://server:" + SERVER_PORT,
         changeOrigin: true,
       }

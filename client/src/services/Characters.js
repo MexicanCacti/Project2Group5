@@ -1,5 +1,20 @@
-export async function uploadCharacter() {
+export async function uploadCharacter(name, file) {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('file', file);
 
+    const res = await fetch('/character/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+    });
+
+    if (!res.ok) {
+        console.error('Failed to upload character');
+        return null;
+    }
+
+    return true;
 }
 
 export async function changeCharacterAlias(username, alias, sourceID){

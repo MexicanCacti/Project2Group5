@@ -3,8 +3,12 @@ const {CheckUserExists} = require("../services/userfunctions");
 const {db} = require("../services/firestore");
 const router = express.Router();
 
-router.post("/character/upload", async (req, res) => {
+const multer = require('multer');
+const upload = multer({ dest: 'uploads' });
 
+router.post("/character/upload", upload.single("file"), async (req, res) => {
+    console.log(req.file)
+    console.log(req.body)
 });
 
 router.post("/alias/update", async (req, res) => {

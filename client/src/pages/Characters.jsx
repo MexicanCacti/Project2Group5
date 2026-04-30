@@ -41,14 +41,14 @@ function Characters() {
     const handleFileChange = (e) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
-        // Example validation: limit file size to 5MB
-        if (selectedFile.size > 5 * 1024 * 1024) {
-            setCharGenFileError("File size must be less than 5MB.");
-            setCharGenRefFile('');
-            return;
-        }
-        setCharGenRefFile(selectedFile);
-        setCharGenFileError('');
+            // Example validation: limit file size to 5MB
+            if (selectedFile.size > 5 * 1024 * 1024) {
+                setCharGenFileError("File size must be less than 5MB.");
+                setCharGenRefFile('');
+                return;
+            }
+            setCharGenRefFile(selectedFile);
+            setCharGenFileError('');
         }
     };
 
