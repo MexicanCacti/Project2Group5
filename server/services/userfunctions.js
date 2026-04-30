@@ -9,6 +9,9 @@ const {db, write_to_collection, update_collection, read_collection} = require('.
 async function CheckUserExists(username) {
     // Note: Username are the docIDs, guaranteed to be unique
     // const doc = await db.collection('users').doc(username).get();
+    if (typeof username !== "string" || !username.trim()) {
+        return null;
+    }
     const userDoc = await read_collection("users", username);
     return userDoc.exists ? userDoc : null;
 }

@@ -12,15 +12,11 @@ app.use(cors({
   origin: "http://localhost:" + (process.env.CLIENT_PORT || 5173)
 }));
 
-
-
 const geminiRouter = require("../routes/gemini");
 const userRouter = require("../routes/user");
 const googlePhotosRouter = require("../routes/googlephotos");
 const characterRouter = require("../routes/character");
 const storyRouter = require("../routes/story");
-const clientPath = path.join(__dirname, '../../client/src');
-app.use(express.static(clientPath));
 
 const clientDistPath = path.join(__dirname, "../../client/dist");
 app.use(express.static(clientDistPath));
@@ -31,7 +27,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,
+    httpOnly: false,
     secure: false,
     sameSite: 'lax',
   },
@@ -45,11 +41,6 @@ app.use('/story', storyRouter)
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
-});
-
-
-app.get("/{*splat}", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
 });
 
 app.listen(PORT, () => {
