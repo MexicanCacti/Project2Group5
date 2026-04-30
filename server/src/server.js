@@ -15,7 +15,7 @@ app.use(cors({
 const geminiRouter = require("../routes/gemini");
 const userRouter = require("../routes/user");
 const googlePhotosRouter = require("../routes/googlephotos");
-const characterRouter = require("../routes/character")
+const characterRouter = require("../routes/character");
 const storyRouter = require("../routes/story");
 const clientPath = path.join(__dirname, '../../client/src');
 app.use(express.static(clientPath));

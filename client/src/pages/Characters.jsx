@@ -71,8 +71,8 @@ function Characters() {
                     {/* */}
                     {charGenHidden && (
                         <form onSubmit={(e) => {
-                                e.handleSubmit();
-                                e.toggleForm();}}
+                                handleSubmit(e);
+                                toggleForm();}}
                             >
                             <label>
                                 Character Name:
@@ -84,7 +84,6 @@ function Characters() {
                                 />
                             </label>
                             <label>
-                                {/*Todo - change this to use a file*/}
                                 Character Reference Image:
                                 <input
                                     type="file"
