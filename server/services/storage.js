@@ -1,7 +1,15 @@
 const {db} = require('../services/firestore');
 const admin = require("firebase-admin");
 
-
+/*
+ Story fields:
+ - StoryID
+ - title
+ - description
+ - characterList [List of characterIDs]
+ - pageCount
+ - pageList [List of pageIDs]
+ */
 async function AddStory(username, title, description){
     // Create a new story document
     const storyRef = db
@@ -27,6 +35,71 @@ async function AddStory(username, title, description){
 }
 
 /*
+Page fields:
+- PageID
+- Page Number
+- SourceID of generated image
+- audioPrompt used to generate image
+ */
+async function AddPage(username, pageNumber, storyID) {
+    // Create a new page document
+    const pageRef = db
+        .collection('users')
+        .doc(username)
+        .collection('pages')
+        .doc();
+
+    await pageRef.set({
+        pageID: pageRef.id,
+        pageNumber: pageNumber,
+        sourceID: "",
+        audioPrompt: "",
+    })
+
+    const storyRef = db
+        .collection('users')
+        .doc(username)
+        .collection('stories')
+        .doc(storyID);
+
+    const storyDoc = await storyRef.get();
+    if(!storyDoc.exists){
+        return pageRef.id;
+    }
+
+    await storyRef.set({
+        pageList: admin.firestore.FieldValue.arrayUnion(pageRef.id),
+    }, {merge: true});
+
+    return pageRef.id;
+}
+
+/*
+Page fields:
+- PageID
+- Page Number
+- SourceID of generated image
+- audioPrompt used to generate image
+ */
+async function SavePage(username, pageNumber, sourceID, audioPrompt, pageID) {
+    // Get page document
+    const pageRef = db
+        .collection('users')
+        .doc(username)
+        .collection('pages')
+        .doc(pageID);
+
+    await pageRef.set({
+        pageID: pageRef.id,
+        pageNumber: pageNumber,
+        sourceID: sourceID,
+        audioPrompt: audioPrompt,
+    }, {merge: true});
+
+    return pageRef.id;
+}
+
+/*
 * Character collection is a list of all the user's uploaded characters
 * The sourceID field: Links to the Image collection's sourceID for lookup
 * Alias: Just for database dashboard readability
@@ -47,6 +120,9 @@ async function SaveCharacter(username, sourceID, alias){
     return characterRef.id;
 }
 
+/*
+    Adds the characterID to the story doc's characterList, then also adds the storyID to the character doc's storyList
+ */
 async function AddCharacterToStory(username, storyID, characterID){
     const storyRef = db
         .collection('users')
@@ -128,6 +204,9 @@ async function GetAllUserCharacters(username) {
     );
 }
 
+/*
+ Self-explanatory
+ */
 async function GetAllUserStories(username) {
     const storySnapshot = await db
         .collection("users")
@@ -147,5 +226,127 @@ async function GetAllUserStories(username) {
     });
 }
 
+/*
+Returns
+- List of all the needed info to display & store character
+- sourceID
+- alias
+- publicUrl
+ */
+async function GetStoryCharacters(username, storyID) {
+    const storyDoc = await db
+        .collection("users")
+        .doc(username)
+        .collection("stories")
+        .doc(storyID)
+        .get();
 
-module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, GetAllUserStories, AddStory}
+    if(!storyDoc.exists) return [];
+
+    const storyData = storyDoc.data();
+    // Check and see if storyData even has any characters, if so then get the list (will be a list of characterIDs)
+    const characterList = Array.isArray(storyData.characterList) ? storyData.characterList : [];
+
+    /*
+     For every characterID in storyDoc.data() characterList...
+    Look up the character in users/username/characters/
+    Retrieve the sourceID from that document field
+    Look up image using sourceID from users/username/images/
+    Return {sourceID, alias, publicUrl} fields for that image
+     */
+    return await Promise.all(
+        characterList.map(async (characterID) => {
+            const characterDoc = await db
+                .collection("users")
+                .doc(username)
+                .collection("characters")
+                .doc(characterID)
+                .get();
+
+            if (!characterDoc.exists) return null;
+
+            const characterData = characterDoc.data();
+            const sourceID = characterData.sourceID;
+
+            if (!sourceID) return null;
+
+            const imageDoc = await db
+                .collection("users")
+                .doc(username)
+                .collection("images")
+                .doc(sourceID)
+                .get()
+
+            if (!imageDoc.exists) return null;
+
+            const imageData = imageDoc.data();
+
+            return {
+                sourceID: sourceID,
+                alias: imageData.alias,
+                url: imageData.publicUrl,
+            };
+        })
+    );
+}
+
+/*
+ Use the storyID to get the storyDoc, then use pageNumber to index into the storyID's pageList to get the pageID
+ Then use the pageID to retrieve the pageDoc to get audioPrompt, and the sourceID
+ Then use the sourceID to get the publicUrl
+ */
+async function GetPageInfo(username, storyID, pageNumber) {
+    // Get story doc
+    const storyDoc = await db
+        .collection("users")
+        .doc(username)
+        .collection("stories")
+        .doc(storyID)
+        .get();
+
+    if(!storyDoc.exists) return null;
+
+    const storyData = storyDoc.data();
+    const pageList = Array.isArray(storyData.pageList) ? storyData.pageList : [];
+
+    // Make sure page number not negative
+    if(pageNumber < 0) return null;
+
+    const pageID = pageList[pageNumber];
+    console.log(pageID);
+
+    // Get page doc
+    const pageDoc = await db
+        .collection("users")
+        .doc(username)
+        .collection("pages")
+        .doc(pageID)
+        .get();
+
+    if(!pageDoc.exists) return null;
+
+    const pageData = pageDoc.data();
+    const sourceID = pageData.sourceID;
+
+    let publicUrl = "";
+
+    // get public url for image display
+    if(sourceID){
+        const imageDoc = await db
+            .collection("users")
+            .doc(username)
+            .collection("images")
+            .doc(sourceID)
+            .get();
+
+        if (imageDoc.exists) publicUrl = imageDoc.data().publicUrl;
+    }
+
+    return {
+        audioPrompt: pageData.audioPrompt,
+        sourceID: pageData.sourceID,
+        generatedImage: publicUrl
+    };
+}
+
+module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, GetAllUserStories, AddStory, AddPage, SavePage, GetPageInfo, GetStoryCharacters}

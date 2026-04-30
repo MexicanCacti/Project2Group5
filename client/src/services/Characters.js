@@ -6,6 +6,9 @@ export async function uploadCharacter(name, file) {
     const res = await fetch('/character/upload', {
         method: 'POST',
         credentials: 'include',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
         body: formData,
     });
 
@@ -47,10 +50,10 @@ export async function fetchAllCharacters(username) {
 
     const data = await res.json();
 
-    console.log("Received:" + data.images);
+    console.log("Received:" + data.characterList);
 
     if(!res.ok){
-        console.error('Failed to fetch characters', data);
+        console.log(data.error);
         return [];
     }
     return data;

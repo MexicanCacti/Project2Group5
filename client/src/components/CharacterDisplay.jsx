@@ -1,7 +1,6 @@
 import DisplayCharacter from "./CharacterBox.jsx";
 
 function DisplayCharacters({ID, username, ImageList, OnImageClick, OnChangeAlias, DisplayStories}){
-    console.log(ImageList)
     return(
         <div id={ID}>
             {ImageList.map((img) => (

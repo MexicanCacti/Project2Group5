@@ -5,7 +5,8 @@ import {useUser} from "../components/UserContext.jsx";
 import {setImages} from "../services/Photos.js";
 import {fetchAllCharacters, changeCharacterAlias} from "../services/Characters.js";
 import DisplayCharacters from "../components/CharacterDisplay.jsx";
-import {createStory} from "../services/Storybooks.js";
+import {createStory, NavigateStoryPage} from "../services/Storybooks.js";
+import {useNavigate} from "react-router-dom";
 
 
 function CreateStory() {
@@ -14,11 +15,12 @@ function CreateStory() {
     const [characterList, setCharacterList] = useState([]);
     const [selectedCharacters, setSelectedCharacters] = useState([]);
     const {username} = useUser();
+    const navigate = useNavigate()
 
     // Load the Character list for selection
     useEffect(() => {
         async function loadCharacters() {
-            if(!username) return;
+            if(username === undefined || username === null) return;
             const characters = await fetchAllCharacters(username);
             await setImages(setCharacterList, characters);
         }
@@ -32,16 +34,18 @@ function CreateStory() {
             const validCharacter = characterList.find((img) => img.id === characterID);
             if(!validCharacter) return prev;
 
-            const isSelected = prev.find((character) => character.characterID === characterID);
-            if(isSelected) return prev.filter((character) => character.characterID !== characterID);
+            const isSelected = prev.find((character) => character.id === characterID);
+            if(isSelected) return prev.filter((character) => character.id !== characterID);
 
             return [
                 ...prev,
                 {
-                    characterID: validCharacter.id,
-                    sourceURL: sourceURL,
+                    id: validCharacter.id,
+                    sourceID: validCharacter.id,
+                    sourceUrl: sourceURL,
                     alias: validCharacter.alias,
                     url: validCharacter.url,
+                    storyList: validCharacter.storyList || []
                 },
             ];
         });
@@ -50,7 +54,13 @@ function CreateStory() {
     async function handleCreateStory(e){
         e.preventDefault();
         const storyCreation = await createStory(username, title, description, selectedCharacters);
+        if(!storyCreation){
+            console.log("Story Creation failed");
+            return;
+        }
 
+        // After story creation, redirect to the first page of the story with the supplied states
+        NavigateStoryPage(navigate, username, storyCreation.storyID, storyCreation.storyTitle, selectedCharacters, 0, storyCreation.pageCount, null);
     }
 
     return (
@@ -94,7 +104,7 @@ function CreateStory() {
                 ) : (
                     <ul>
                         {selectedCharacters.map((character) => (
-                            <li key={character.characterID}>
+                            <li key={character.id}>
                                 {character.alias}
                             </li>
                         ))}

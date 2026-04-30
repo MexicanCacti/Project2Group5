@@ -2,12 +2,15 @@ import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Storybooks.css'
 import NavButton from "../components/NavButton.jsx";
 import {useEffect, useState} from "react";
-import {fetchAllStories} from "../services/Storybooks.js";
+import {fetchAllStories, NavigateStoryPage} from "../services/Storybooks.js";
 
 import {useUser} from "../components/UserContext.jsx";
+import {useNavigate} from "react-router-dom";
+
 function Storybooks() {
     const [stories, setStories] = useState([]);
     const {username} = useUser();
+    const navigate = useNavigate();
 
     // On page load, retrieves every storybook a user created
     useEffect(() => {
@@ -48,7 +51,7 @@ function Storybooks() {
                                 <NavButton
                                     label="Open"
                                     id={`open-${story.id}`}
-                                    destination={`/stories/${story.id}/0`}
+                                    OnClick= {() => NavigateStoryPage(navigate, username, story.id, story.title, [], 0, story.pageCount)}
                                 />
                             </div>
                         ))

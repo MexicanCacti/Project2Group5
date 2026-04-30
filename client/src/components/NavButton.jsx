@@ -9,7 +9,7 @@ import '../styles/NavButton.css'
         className - Same as id
     Basically just a reusable component for creating any clickable navigation button
  */
-function NavButton({label, destination, image, id = "NavButtonId", className = "NavButton"}) {
+function NavButton({label, destination, image, id = "NavButtonId", className = "NavButton", OnClick}) {
     const navigate = useNavigate();
 
     let imageElement = null;
@@ -28,7 +28,7 @@ function NavButton({label, destination, image, id = "NavButtonId", className = "
         <button
             className={className}
             id={id}
-            onClick={() => navigate(destination)}
+            onClick={() => {if(OnClick) {OnClick();} else {navigate(destination);} }}
         >
             {imageElement}
             <span>{label}</span>

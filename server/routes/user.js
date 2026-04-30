@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
 
-        if(!username || !password){
+        if(username === undefined || username === null || password === undefined || password === null ){
             return res.status(400).json({ error: "Username and password are required" });
         }
 
@@ -89,7 +89,7 @@ router.get('/o_status', async (req, res) => {
     try{
         const username = req.query.username;
         //console.log('req.query.username:', username);
-        if(!username) {
+        if(username === undefined || username === null) {
             return res.status(400).json({ error: "No username supplied" });
         }
 
@@ -144,7 +144,7 @@ router.get('/oauth_callback', async (req, res) => {
 router.get('/characters', async (req, res) => {
     try{
         const {username} = req.query;
-        if(!username) {
+        if(username === undefined || username === null) {
             return res.status(400).json({ error: "No username supplied" });
         }
 
@@ -155,7 +155,7 @@ router.get('/characters', async (req, res) => {
 
         const characters = await GetAllUserCharacters(username);
 
-        return res.json({ images: characters});
+        return res.json({ characterList: characters});
 
     } catch(err) {
         console.log(err);
@@ -167,7 +167,7 @@ router.get('/characters', async (req, res) => {
 router.get('/stories', async (req, res) => {
     try{
         const {username} = req.query;
-        if(!username) {
+        if(username === undefined || username === null) {
             return res.status(400).json({ error: "No username supplied" });
         }
 

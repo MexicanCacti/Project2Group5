@@ -87,7 +87,7 @@ router.get('/session/:sessionID/media', async (req, res) => {
             return res.status(400).json({error: "No session ID provided"});
         }
 
-        if(!username){
+        if(username === undefined || username === null){
             return res.status(400).json({error: "No Username provided"});
         }
 
@@ -180,7 +180,7 @@ router.get('/session/:sessionID/media', async (req, res) => {
             sessionID,
             mediaItemsSet: true,
             primaryImageUrl: storedImages[0]?.url || null,
-            images: storedImages,
+            characterList: storedImages,
         });
     } catch (err) {
         return res.status(500).json({error: "Failed to fetch picked media", details: err.message});

@@ -22,7 +22,7 @@ export async function UploadGooglePhotos(username) {
     const status = await statusRes.json();
 
     if (!statusRes.ok) {
-        console.error(status);
+        console.error(status.details);
         return null;
     }
 
@@ -43,7 +43,7 @@ export async function UploadGooglePhotos(username) {
     const data = await pickersetup.json();
 
     if (!pickersetup.ok) {
-        console.error("session setup failed", data);
+        console.error("session setup failed");
         return null;
     }
 
@@ -87,10 +87,12 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
     const data = await res.json();
 
     if (!res.ok) {
+        console.log(data.details);
         return null;
     }
 
     if (!data.ready) {
+        console.log('data not ready');
         return null;
     }
 
@@ -99,10 +101,18 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
 
 // Append new images to the current image list
 export async function addImages(setImageListState, imageList) {
-    setImageListState((prev) => [...prev, ...(imageList.images || [])]);
+    const images = Array.isArray(imageList)
+        ? imageList
+        : imageList.characterList || imageList.images || [];
+
+    setImageListState((prev) => [...prev, ...(images)]);
 }
 
 // Complete replace the image list
 export async function setImages(setImageListState, imageList){
-    setImageListState((imageList.images || []));
+    const images = Array.isArray(imageList)
+        ? imageList
+        : imageList.characterList || imageList.images || [];
+
+    setImageListState(images);
 }

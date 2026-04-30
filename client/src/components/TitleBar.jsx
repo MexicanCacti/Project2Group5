@@ -10,7 +10,6 @@ function TitleBar(){
             <NavButton className="TitleButton" id="TitleCharacters" label="Characters" destination={"/characters"} />
             <NavButton className="TitleButton" id="TitleCreate" label="Create Story" destination={"/create"} />
             <NavButton className="TitleButton" id="TitleStories" label="My Storybooks" destination={"/stories"} />
-            <NavButton className="TitleButton" id="pagetest" label="testpage" destination={"/page"} />
             <LoginBox />
         </div>
     );

@@ -1,7 +1,7 @@
 const path = require('path');
 const {bucket, db, write_to_collection, read_collection} = require('./firestore');
 const {SaveCharacter, AddCharacterToStory} = require("./storage");
-const {getLabels} = require("./vision");
+//const {getLabels} = require("./vision");
 
 async function GetSignedURL(file){
     return await file.getSignedUrl({
@@ -42,7 +42,7 @@ async function SaveGoogleImageToStorage({
         .get();
 
     // Try to inject label description of the image from Vision API
-    labels = await getLabels(imageBuffer)
+    //labels = await getLabels(imageBuffer)
 
     // New file, save to bucket & firestore
     if(!existingFile.exists){
@@ -72,8 +72,7 @@ async function SaveGoogleImageToStorage({
                 storagePath: objectPath,
                 publicUrl: signedURL,
                 createdAt: Date.now(),
-                alias: "Default",
-                labels: labels
+                alias: "Default"
             });
 
         existingFile = await db
