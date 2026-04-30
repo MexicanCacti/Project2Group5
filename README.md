@@ -1,3 +1,10 @@
+# Students
+Joshua Cupler - vu8062
+
+Eric Chhun - ar5618
+
+Joseph Dominguez - dg6578
+
 # Running the Application
 
 ## Build and Run
