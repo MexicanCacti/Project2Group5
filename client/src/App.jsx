@@ -16,6 +16,7 @@ function App() {
               <Route path="/stories" element={<Storybooks/>} />
               <Route path="/page" element={<Page/>} />
               <Route path="/AuthComplete" element={<AuthComplete/>} />
+              <Route path="/story/:storyID/:pageNumber" element={<Page/>} />
           </Routes>
       </Router>
   )

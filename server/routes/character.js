@@ -11,9 +11,9 @@ router.post("/alias/update", async (req, res) => {
     try{
         const { username, alias, sourceID } = req.body;
 
-        if(!username) return res.status(400).json({error: "No username provided"});
-        if(!alias) return res.status(400).json({error: "No alias provided"});
-        if(!sourceID) return res.status(400).json({error: "No source ID provided"});
+        if(username === undefined || username === null) return res.status(400).json({error: "No username provided"});
+        if(alias === undefined || alias === null) return res.status(400).json({error: "No alias provided"});
+        if(sourceID === undefined || sourceID === null) return res.status(400).json({error: "No source ID provided"});
 
         const userRef = await CheckUserExists(username);
         if(!userRef) return res.status(404).json({error: "User not found"});

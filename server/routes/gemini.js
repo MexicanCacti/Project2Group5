@@ -46,6 +46,7 @@ router.post("/transcribe", async (req, res) => {
     }
 });
 
+// Note: This function will not work because we don't have api key permission to access flash-image
 router.post("/generate", async (req, res) => {
     try {
         const { text } = req.body;

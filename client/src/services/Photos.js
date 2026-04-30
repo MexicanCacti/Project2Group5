@@ -99,10 +99,18 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
 
 // Append new images to the current image list
 export async function addImages(setImageListState, imageList) {
-    setImageListState((prev) => [...prev, ...(imageList.images || [])]);
+    const images = Array.isArray(imageList)
+        ? imageList
+        : imageList.characterList || imageList.images || [];
+
+    setImageListState((prev) => [...prev, ...(images)]);
 }
 
 // Complete replace the image list
 export async function setImages(setImageListState, imageList){
-    setImageListState((imageList.images || []));
+    const images = Array.isArray(imageList)
+        ? imageList
+        : imageList.characterList || imageList.images || [];
+
+    setImageListState(images);
 }
