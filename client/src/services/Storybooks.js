@@ -127,6 +127,19 @@ export async function fetchStoryCharacters(username, storyID){
     return data;
 }
 
+export async function removeStory(username, storyID){
+    const res = await fetch(`/story/${encodeURIComponent(username)}/${encodeURIComponent(storyID)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+    const data = await res.json();
+    if(!res.ok){
+        console.log(data.error);
+        return null;
+    }
+    return data;
+}
+
 // Function used when navigating storybook pages, must be passed the navigate hook
 /*
     Args pretty self-explanatory

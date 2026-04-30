@@ -350,4 +350,72 @@ async function GetPageInfo(username, storyID, pageNumber) {
     };
 }
 
-module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, GetAllUserStories, AddStory, AddPage, SavePage, GetPageInfo, GetStoryCharacters}
+// Delete any page document with pageID in pageList
+// Go to each character with characterID in characterList, remove story from storyList if id matches storyID
+// Finally delete the story document
+async function RemoveStory(username, storyID) {
+    const storyRef = await db
+        .collection("users")
+        .doc(username)
+        .collection("stories")
+        .doc(storyID);
+
+    const storyDoc = await storyRef.get();
+    if(!storyDoc.exists) return false;
+
+    const storyData = storyDoc.data();
+    const pageList = Array.isArray(storyData.pageList) ? storyData.pageList : [];
+    const characterList = Array.isArray(storyData.characterList) ? storyData.characterList : [];
+
+    await Promise.all(
+        // Go through page list, delete any page documents with a match pageID
+        pageList.map(async (pageID) => {
+            if(!pageID) return;
+            await db
+                .collection("users")
+                .doc(username)
+                .collection("pages")
+                .doc(pageID)
+                .delete();
+        })
+    );
+
+    await Promise.all(
+        characterList.map(async (characterID) => {
+            if(!characterID) return;
+
+            // Retrieve the character
+            const characterRef = db
+                .collection("users")
+                .doc(username)
+                .collection("characters")
+                .doc(characterID)
+
+            const characterDoc = await characterRef.get();
+            if (!characterDoc.exists) return;
+
+            const characterData = characterDoc.data();
+            const storyList = Array.isArray(characterData.storyList) ? characterData.storyList : [];
+
+            // Get the storyList without the storyID
+            const filterList = storyList.filter((story) => {
+                return story.id !== storyID;
+
+            })
+
+            // set the storyList to be the list without the storyID
+            await characterRef.set(
+                {
+                    storyList: filterList,
+                },
+                {merge: true}
+            );
+
+        })
+    );
+
+    await storyRef.delete();
+    return true;
+}
+
+module.exports = {SaveCharacter, AddCharacterToStory, GetAllUserCharacters, GetAllUserStories, AddStory, AddPage, SavePage, GetPageInfo, GetStoryCharacters, RemoveStory}

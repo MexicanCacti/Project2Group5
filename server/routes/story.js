@@ -1,6 +1,6 @@
 const express = require('express');
 const {CheckUserExists} = require("../services/userfunctions");
-const {AddStory, AddCharacterToStory, GetStoryCharacters, GetPageInfo, AddPage, SavePage} = require('../services/storage')
+const {AddStory, AddCharacterToStory, GetStoryCharacters, GetPageInfo, AddPage, SavePage, RemoveStory} = require('../services/storage')
 
 const router = express.Router();
 
@@ -148,6 +148,29 @@ router.get("/page/:username/:storyID/:pageNumber", async (req, res) => {
     } catch(err){
         return res.status(500).json({error: "Failed to fetch page number"});
     }
+})
+
+router.delete("/:username/:storyID", async (req, res) => {
+    try{
+        const {username, storyID} = req.params;
+        //console.log(`Delete recieved: ${username}, ${storyID}`);
+        if(username === undefined || username === null) return res.status(400).json({error: "No username provided"});
+        if(storyID === undefined || storyID === null) return res.status(400).json({error: "No storyID provided"});
+
+        const userRef = await CheckUserExists(username);
+
+        if(!userRef) return res.status(404).json({error: "User not found"});
+
+        const storyRemove = await RemoveStory(username, storyID);
+        if(!storyRemove){
+            return res.status(500).json({error: "Failed to remove story"});
+        }
+
+        return res.status(200).json({message: "Successfully removed story with id " + storyRemove.id});
+    } catch (err){
+        return res.status(500).json({error: "Failed to remove story"})
+    }
+
 })
 
 module.exports=router;

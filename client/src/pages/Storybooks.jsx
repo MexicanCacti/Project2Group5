@@ -2,7 +2,7 @@ import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Storybooks.css'
 import NavButton from "../components/NavButton.jsx";
 import {useEffect, useState} from "react";
-import {fetchAllStories, fetchPageInfo, NavigateStoryPage} from "../services/Storybooks.js";
+import {fetchAllStories, fetchPageInfo, NavigateStoryPage, removeStory} from "../services/Storybooks.js";
 
 import {useUser} from "../components/UserContext.jsx";
 import {useNavigate} from "react-router-dom";
@@ -23,6 +23,14 @@ function Storybooks() {
         loadStories();
     }, [username]);
 
+    async function handleStoryRemove(username, storyID){
+        const result = await removeStory(username, storyID);
+        if(result === null){
+            return;
+        }
+
+        setStories((prev) => prev.filter((story) => story.id !== storyID));
+    }
     return (
         <div id="Stories">
             <TitleBar />
@@ -53,6 +61,11 @@ function Storybooks() {
                                     id={`open-${story.id}`}
                                     OnClick= {() =>
                                         NavigateStoryPage(navigate, username, story.id, story.title, [], 0, story.pageCount, null)}
+                                />
+                                <NavButton
+                                    label="Remove"
+                                    id={`delete-${story.id}`}
+                                    OnClick= {() => handleStoryRemove(username, story.id)}
                                 />
                             </div>
                         ))
