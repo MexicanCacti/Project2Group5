@@ -2,7 +2,7 @@ import TitleBar from "../components/TitleBar.jsx";
 import '../styles/Storybooks.css'
 import NavButton from "../components/NavButton.jsx";
 import {useEffect, useState} from "react";
-import {fetchAllStories, NavigateStoryPage} from "../services/Storybooks.js";
+import {fetchAllStories, fetchPageInfo, NavigateStoryPage} from "../services/Storybooks.js";
 
 import {useUser} from "../components/UserContext.jsx";
 import {useNavigate} from "react-router-dom";
@@ -51,7 +51,8 @@ function Storybooks() {
                                 <NavButton
                                     label="Open"
                                     id={`open-${story.id}`}
-                                    OnClick= {() => NavigateStoryPage(navigate, username, story.id, story.title, [], 0, story.pageCount)}
+                                    OnClick= {() =>
+                                        NavigateStoryPage(navigate, username, story.id, story.title, [], 0, story.pageCount, null)}
                                 />
                             </div>
                         ))

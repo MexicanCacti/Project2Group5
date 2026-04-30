@@ -47,10 +47,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
-// Needed for gcloud deployment
-app.get('/AuthComplete', (req,res) => {
-  res.sendFile(path.join(clientDistPath, "index.html/pages/AuthComplete.jsx"))
-})
+
+app.get("/{*splat}", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT}`);

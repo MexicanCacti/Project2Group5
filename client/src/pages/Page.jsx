@@ -197,8 +197,6 @@ function Page() {
         setUsername(location.state.username);
         setPageCount(location.state.pageCount);
         setPageInfo(location.state.pageInfo);
-
-        console.log(location.state.characterList);
     }, [location.state, setUsername]);
 
     // Now retrieve the rest of the needed info
@@ -210,38 +208,39 @@ function Page() {
             await setImages(setCharacterList, characters);
         }
 
-        async function createPage() {
-            let currentPageInfo = pageInfo;
-            if(currentPageInfo === null || currentPageInfo === undefined){
-                currentPageInfo = await addPage(username, pageNumber, storyID);
-                if(currentPageInfo) setPageInfo(currentPageInfo);
+        async function initPage() {
+            const currentPageInfo = await fetchPageInfo(username, storyID, pageNumber);
+            // Image exists so set everything
+            if(currentPageInfo){
+                setPageInfo(currentPageInfo);
+                if(currentPageInfo.audioPrompt) setAudioDescription(currentPageInfo.audioPrompt);
+                if(currentPageInfo.generatedImage) setGeneratedImage(currentPageInfo.generatedImage);
+                if(currentPageInfo.sourceID) setGeneratedSource(currentPageInfo.sourceID);
+
+                return;
             }
-            await savePage(username, pageNumber, generatedSource, audioDescription, currentPageInfo.pageID);
+
+            // Otherwise this is a new page, go ahead and add it
+            const newPageInfo = await addPage(username, pageNumber, storyID);
+            if(newPageInfo?.pageID) setPageInfo(newPageInfo);
         }
 
-        // NOTE: In console should fail if this was redirected straight from Create Story!
-        async function loadPageInfo(){
-            let pageInfo = await fetchPageInfo(username, storyID, pageNumber);
-            if(pageInfo?.audioPrompt) setAudioDescription(pageInfo.audioPrompt);
-            if(pageInfo?.generatedImage) setGeneratedImage(pageInfo.generatedImage);
-            if(pageInfo?.sourceID) setGeneratedSource(pageInfo.sourceID);
-        }
-        createPage();
         loadCharacters();
-        loadPageInfo();
-    }, [username, storyID, pageNumber, pageInfo]);
+        initPage();
+    }, [username, storyID, pageNumber]);
 
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
         setAudioDescription(result);
     }
 
-    async function UploadText(AudioText) {
-        const result = await GenerateImage(AudioText);
+    async function HandleGeneration(AudioText, CharacterList) {
+        const result = await GenerateImage(AudioText, characterList);
         setGeneratedImage(result);
     }
 
     async function handleSavePage(){
+        if (!pageInfo?.pageID) return;
         const result = await savePage(username, pageNumber, generatedSource, audioDescription, pageInfo.pageID);
     }
 
@@ -255,7 +254,7 @@ function Page() {
         await handleSavePage();
         const nextPageNumber = pageNumber + 1;
         const nextPageCount = nextPageNumber > pageCount - 1 ? pageCount + 1 : pageCount;
-        setPageCount(pageCount + 1);
+        setPageCount(nextPageCount);
         NavigateStoryPage(navigate, username, storyID, storyTitle, characterList, nextPageNumber, nextPageCount, null);
     }
 
@@ -290,7 +289,7 @@ function Page() {
                 <SimpleRecordButton
                     HandleRecording={ UploadAudio }
                 />
-                <button onClick={() => UploadText(audioDescription)}>Generate Image</button>
+                <button onClick={() => HandleGeneration(audioDescription, characterList)}>Generate Image</button>
                 <button onClick={() => handleSavePage()}>Save Page</button>
             </div>
 

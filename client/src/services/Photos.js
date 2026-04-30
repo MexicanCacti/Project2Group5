@@ -1,11 +1,12 @@
-export async function GenerateImage(TextSource){
+export async function GenerateImage(TextSource, CharacterList){
     const res = await fetch("/gemini/generate", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-             text: TextSource
+             text: TextSource,
+             characterList: CharacterList,
         }),
     });
 

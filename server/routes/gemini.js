@@ -49,24 +49,55 @@ router.post("/transcribe", async (req, res) => {
 // Note: This function will not work because we don't have api key permission to access flash-image
 router.post("/generate", async (req, res) => {
     try {
-        const { text } = req.body;
+        const { text, characterList} = req.body;
 
         if (typeof text !== "string") {
             return res.status(400).json({ error: "Invalid text input" });
         }
 
         // Basically give the prompt, then provide the data for the prompt to work with.
-        const TextPrompt = `Create a cartoon-style illustration with clean outlines, vibrant colors, and a playful look: ${text}
-    Do not give request further options or elaboration, just generate a single image and return that.`
-        ;
+        const rules = `
+        Create a cartoon-style illustration with clean outlines, vibrant colors, and a playful look.
+        For the image, characters may be referred to by an alias. Each alias corresponds to the image provided below in the prompt.
+        
+        This is the text request of the scene for you to work with: ${text}
+        
+        If an alias is mentioned, use the matching reference image for that alias when placing them into the scene
+        Don't ask follow up questions and Generate exactly one final image
+        `;
 
-        console.log(TextPrompt);
+        const parts = [{text: rules}];
+        for(const character of characterList){
+            if(!character?.url || !character?.alias) continue;
+
+            // Retrieve the image from download url
+            const imageRes = await fetch(character.url);
+            if(!imageRes.ok) continue;
+
+            const contentType = imageRes.headers.get("content-type") || "image/jpeg";
+            const buffer = await imageRes.arrayBuffer();
+            const base64Img = Buffer.from(buffer).toString("base64");
+
+            parts.push({text: `This image is the character reference for the alias: '${character.alias}'`});
+
+            parts.push({
+                inlineData: {
+                    mimeType: contentType,
+                    data: base64Img,
+                }
+            });
+        }
+
+        console.log(parts);
+
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-image",
-            contents: TextPrompt
+            contents: [
+                {
+                    parts
+                },
+            ],
         });
-
-
 
         for (const part of response.parts || []) {
             if (part.inlineData) {

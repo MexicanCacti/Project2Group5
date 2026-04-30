@@ -128,8 +128,8 @@ router.get("/characters/:username/:storyID", async (req, res) => {
  */
 router.get("/page/:username/:storyID/:pageNumber", async (req, res) => {
     try{
-        const {username, storyID, pageNumber} = req.params;
-        console.log(username + " " + storyID + " " + pageNumber);
+        const { username, storyID, pageNumber} = req.params;
+        console.log("backend /page/.../page# receieved: ", username + " " + storyID + " " + pageNumber);
         if(username === undefined || username === null) return res.status(400).json({error: "No username provided"});
         if(storyID === undefined || storyID === null) return res.status(400).json({error: "No storyID provided"});
         if(pageNumber === undefined || pageNumber === null) return res.status(404).json({error: "No page number provided"});

@@ -68,6 +68,7 @@ async function AddPage(username, pageNumber, storyID) {
     }
 
     await storyRef.set({
+        pageCount: storyDoc.data().pageCount + 1,
         pageList: admin.firestore.FieldValue.arrayUnion(pageRef.id),
     }, {merge: true});
 
