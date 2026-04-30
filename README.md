@@ -38,6 +38,7 @@ npm run rebuild
 - REDIRECT_URL: URL to process the OAUTH call back
 - FRONTEND_OAUTH_COMPLETE_URL: Where to redirect the client once OAuth completes
 - FIREBASE_STORAGE_BUCKET: URL to bucket to store images
+- GOOGLE_APPLICATION_CREDENTIALS: Path to json for vision credentials
 
 #### Client /client/.env
 - No env required yet
@@ -71,5 +72,6 @@ gcloud app deploy ./app.yaml
 - REDIRECT_URL: URL to process the OAUTH call back
 - FRONTEND_OAUTH_COMPLETE_URL: Where to redirect the client once OAuth completes
 - FIREBASE_STORAGE_BUCKET: URL to bucket to store images
+- GOOGLE_APPLICATION_CREDENTIALS: Path to json for vision credentials
 
 Basically, instead of local deployment having separate .env files for client/server, GAE deployment centralizes them into one under app.yaml
