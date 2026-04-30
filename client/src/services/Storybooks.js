@@ -132,7 +132,7 @@ export async function fetchStoryCharacters(username, storyID){
     Args pretty self-explanatory
     On page load, will make calls to the backend to populate the page
  */
-export function NavigateStoryPage(navigate, username, storyID, storyTitle, characterList, pageNumber, pageCount){
+export function NavigateStoryPage(navigate, username, storyID, storyTitle, characterList, pageNumber, pageCount, pageInfo){
      navigate(`/story/${storyID}/${pageNumber}`, {
         state: {
             storyID: storyID,
@@ -140,7 +140,8 @@ export function NavigateStoryPage(navigate, username, storyID, storyTitle, chara
             username: username,
             characterList: characterList,
             pageNumber: pageNumber,
-            pageCount: pageCount
+            pageCount: pageCount,
+            pageInfo: pageInfo
         },
     });
 }

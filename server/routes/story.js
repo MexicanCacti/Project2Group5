@@ -77,6 +77,7 @@ router.post("/create/page", async (req, res) => {
 router.post("/save/page", async (req, res) => {
     try{
         const {username, pageNumber, sourceID, audioPrompt, pageID} = req.body;
+        console.log(`Received: ${username}, ${pageNumber}, ${sourceID}, ${audioPrompt}, ${pageID}`);
         if(username === undefined || username === null) return res.status(400).json({error: "No username provided"});
         if(pageNumber === undefined || pageNumber === null) return res.status(400).json({error: "No page number provided"});
         if(sourceID === undefined || sourceID === null) return res.status(400).json({error: "No source ID provided"});

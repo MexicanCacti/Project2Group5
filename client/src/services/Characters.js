@@ -6,6 +6,9 @@ export async function uploadCharacter(name, file) {
     const res = await fetch('/character/upload', {
         method: 'POST',
         credentials: 'include',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
         body: formData,
     });
 

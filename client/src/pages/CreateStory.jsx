@@ -60,7 +60,7 @@ function CreateStory() {
         }
 
         // After story creation, redirect to the first page of the story with the supplied states
-        NavigateStoryPage(navigate, username, storyCreation.storyID, storyCreation.storyTitle, selectedCharacters, 0, storyCreation.pageCount);
+        NavigateStoryPage(navigate, username, storyCreation.storyID, storyCreation.storyTitle, selectedCharacters, 0, storyCreation.pageCount, null);
     }
 
     return (

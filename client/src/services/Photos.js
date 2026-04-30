@@ -22,7 +22,7 @@ export async function UploadGooglePhotos(username) {
     const status = await statusRes.json();
 
     if (!statusRes.ok) {
-        console.error(status);
+        console.error(status.details);
         return null;
     }
 
@@ -43,7 +43,7 @@ export async function UploadGooglePhotos(username) {
     const data = await pickersetup.json();
 
     if (!pickersetup.ok) {
-        console.error("session setup failed", data);
+        console.error("session setup failed");
         return null;
     }
 
@@ -87,10 +87,12 @@ export async function WaitForPickedGooglePhoto(username, sessionID) {
     const data = await res.json();
 
     if (!res.ok) {
+        console.log(data.details);
         return null;
     }
 
     if (!data.ready) {
+        console.log('data not ready');
         return null;
     }
 

@@ -5,14 +5,15 @@ import '../styles/Page.css';
 import {TranscribeAudio} from '../services/Audio.js';
 import { GenerateImage, setImages } from '../services/Photos.js';
 
-import {changeCharacterAlias, fetchAllCharacters} from '../services/Characters.js';
+import {changeCharacterAlias} from '../services/Characters.js';
 
 import defaultImage from '../assets/hero.png';
 import {useUser} from "../components/UserContext.jsx";
 import GooglePhotosButton from '../components/GooglePhotosButton.jsx';
 import DisplayCharacters from "../components/CharacterDisplay.jsx";
 import {useLocation} from "react-router-dom";
-import {addPage, fetchPageInfo, fetchStoryCharacters, savePage} from "../services/Storybooks.js";
+import {addPage, fetchPageInfo, fetchStoryCharacters, NavigateStoryPage, savePage} from "../services/Storybooks.js";
+import {useNavigate} from "react-router-dom";
 
 /*
 * Code adapted from:
@@ -179,10 +180,12 @@ function Page() {
     const [storyTitle, setStoryTitle] = useState('');
     const [pageNumber, setPageNumber] = useState(0);
     const [pageCount, setPageCount] = useState(0);
-    const [pageID, setPageID] = useState(null);
+    const [pageInfo, setPageInfo] = useState(null);
 
     // So that when we are redirected to a page with the passed in states, we can populate the page's state
     const location = useLocation();
+
+    const navigate = useNavigate();
 
     // Use location states to populate
     useEffect(() => {
@@ -193,6 +196,7 @@ function Page() {
         setCharacterList(location.state.characterList);
         setUsername(location.state.username);
         setPageCount(location.state.pageCount);
+        setPageInfo(location.state.pageInfo);
 
         console.log(location.state.characterList);
     }, [location.state, setUsername]);
@@ -207,23 +211,25 @@ function Page() {
         }
 
         async function createPage() {
-            let pID = await addPage(username, pageNumber, storyID);
-            if(pID) setPageID(pID);
-
+            let currentPageInfo = pageInfo;
+            if(currentPageInfo === null || currentPageInfo === undefined){
+                currentPageInfo = await addPage(username, pageNumber, storyID);
+                if(currentPageInfo) setPageInfo(currentPageInfo);
+            }
+            await savePage(username, pageNumber, generatedSource, audioDescription, currentPageInfo.pageID);
         }
 
+        // NOTE: In console should fail if this was redirected straight from Create Story!
         async function loadPageInfo(){
             let pageInfo = await fetchPageInfo(username, storyID, pageNumber);
-            if(pageInfo?.audioPrompt){
-                setAudioDescription(pageInfo.audioPrompt);
-            }
+            if(pageInfo?.audioPrompt) setAudioDescription(pageInfo.audioPrompt);
             if(pageInfo?.generatedImage) setGeneratedImage(pageInfo.generatedImage);
             if(pageInfo?.sourceID) setGeneratedSource(pageInfo.sourceID);
         }
         createPage();
         loadCharacters();
         loadPageInfo();
-    }, [username, storyID, pageNumber]);
+    }, [username, storyID, pageNumber, pageInfo]);
 
     async function UploadAudio(AudioBlob){
         const result = await TranscribeAudio(AudioBlob);
@@ -236,7 +242,21 @@ function Page() {
     }
 
     async function handleSavePage(){
-        const result = await savePage(username, pageNumber, generatedSource, audioDescription, pageID);
+        const result = await savePage(username, pageNumber, generatedSource, audioDescription, pageInfo.pageID);
+    }
+
+    async function handlePrevPage() {
+        if(pageNumber <= 0) return;
+        await handleSavePage();
+        NavigateStoryPage(navigate, username, storyID, storyTitle, characterList, pageNumber - 1, pageCount, null);
+    }
+
+    async function handleNextPage() {
+        await handleSavePage();
+        const nextPageNumber = pageNumber + 1;
+        const nextPageCount = nextPageNumber > pageCount - 1 ? pageCount + 1 : pageCount;
+        setPageCount(pageCount + 1);
+        NavigateStoryPage(navigate, username, storyID, storyTitle, characterList, nextPageNumber, nextPageCount, null);
     }
 
     return (
@@ -246,7 +266,19 @@ function Page() {
                 <h1>StoryTitle: {storyTitle}</h1>
                 <ImageBox value={generatedImage} />
                 <p>Page[{pageNumber}]</p>
+                <div id="PageImageNavigation">
+                    {pageNumber > 0 && (
+                        <button onClick={handlePrevPage}>
+                            Previous Page
+                        </button>
+                    )}
+                    {pageNumber >= 0 && (
+                        <button onClick={handleNextPage}>Next Page
+                        </button>
+                    )}
+                </div>
             </div>
+
 
             <div id="AudioPortion">
                 <h3>Transcribed Audio</h3>

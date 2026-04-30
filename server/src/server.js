@@ -12,6 +12,8 @@ app.use(cors({
   origin: "http://localhost:" + (process.env.CLIENT_PORT || 5173)
 }));
 
+
+
 const geminiRouter = require("../routes/gemini");
 const userRouter = require("../routes/user");
 const googlePhotosRouter = require("../routes/googlephotos");

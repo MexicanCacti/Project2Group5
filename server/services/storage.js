@@ -284,7 +284,7 @@ async function GetStoryCharacters(username, storyID) {
             return {
                 sourceID: sourceID,
                 alias: imageData.alias,
-                publicUrl: imageData.publicUrl,
+                url: imageData.publicUrl,
             };
         })
     );
